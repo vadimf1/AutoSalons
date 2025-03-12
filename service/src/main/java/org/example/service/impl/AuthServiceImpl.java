@@ -2,6 +2,7 @@ package org.example.service.impl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.example.exception.AuthenticationFailedException;
 import org.example.repository.UserRepository;
 import org.example.dto.LoginRequestDto;
 import org.example.dto.LoginResponseDto;
@@ -11,11 +12,12 @@ import org.example.dto.RegisterRequestDto;
 import org.example.model.Role;
 import org.example.model.User;
 import org.example.service.AuthService;
-import org.example.util.error.UserExceptionCode;
+import org.example.util.error.AuthenticationExceptionCode;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -41,20 +43,25 @@ public class AuthServiceImpl implements AuthService {
     }
 
     public LoginResponseDto login(LoginRequestDto loginRequestDto) {
-        Authentication authentication = authenticationManager.authenticate(
+        UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(
                         loginRequestDto.getUsername(),
-                        loginRequestDto.getPassword()));
+                        loginRequestDto.getPassword());
 
-        User user = userRepository.findByUsername(loginRequestDto.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException(UserExceptionCode.USER_NOT_FOUND_BY_USERNAME.getMessage() + loginRequestDto.getUsername()));
+        Authentication authentication = authenticationManager.authenticate(authenticationToken);
+//        try {
+//            authentication = authenticationManager.authenticate(authenticationToken);
+//        } catch (BadCredentialsException ex) {
+//            throw new AuthenticationFailedException(AuthenticationExceptionCode.INVALID_USERNAME_OR_PASSWORD.getMessage());
+//        }
 
-        String token = jwtSecurityService.generateToken(user);
-        String refreshToken = jwtSecurityService.generateRefreshToken(new HashMap<>(), user);
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        String token = jwtSecurityService.generateToken(userDetails);
+        String refreshToken = jwtSecurityService.generateRefreshToken(new HashMap<>(), userDetails);
 
         return LoginResponseDto
                 .builder()
-                .username(loginRequestDto.getUsername())
                 .jwtToken(token)
                 .refreshToken(refreshToken)
                 .build();
@@ -70,13 +77,8 @@ public class AuthServiceImpl implements AuthService {
         if (jwtSecurityService.validateToken(jwt, user)) {
             RefreshTokenResponseDto refreshTokenResponseDto = new RefreshTokenResponseDto();
 
-            refreshTokenResponseDto
-                    .setJwtToken(
-                            jwtSecurityService.generateToken(user));
-
-            refreshTokenResponseDto
-                    .setRefreshToken(
-                            jwtSecurityService.generateRefreshToken(new HashMap<>(), user));
+            refreshTokenResponseDto.setJwtToken(jwtSecurityService.generateToken(user));
+            refreshTokenResponseDto.setRefreshToken(jwtSecurityService.generateRefreshToken(new HashMap<>(), user));
 
             return refreshTokenResponseDto;
         }

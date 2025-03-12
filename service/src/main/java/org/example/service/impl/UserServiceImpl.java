@@ -58,6 +58,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new ServiceException(UserExceptionCode.USER_NOT_FOUND_BY_ID.getMessage() + username));
+                .orElseThrow(() -> new UsernameNotFoundException(UserExceptionCode.USER_NOT_FOUND_BY_USERNAME.getMessage() + username));
     }
 }
