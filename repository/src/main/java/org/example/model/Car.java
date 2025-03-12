@@ -57,7 +57,7 @@ public class Car extends BaseEntity {
     @Column(name = "status", nullable = false)
     private String status;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "autosalons_cars",
             joinColumns = @JoinColumn(name = "car_id"),
@@ -65,7 +65,7 @@ public class Car extends BaseEntity {
     )
     private Set<AutoSalon> autoSalons;
 
-    @OneToMany(mappedBy = "car")
+    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
     private Set<DealerCar> dealerCars;
 
     @OneToMany(mappedBy = "car")
@@ -79,12 +79,5 @@ public class Car extends BaseEntity {
             this.autoSalons = new HashSet<>();
         }
         this.autoSalons.add(autoSalon);
-    }
-
-    public void addDealerCar(DealerCar dealerCar) {
-        if (this.dealerCars == null) {
-            this.dealerCars = new HashSet<>();
-        }
-        this.dealerCars.add(dealerCar);
     }
 }

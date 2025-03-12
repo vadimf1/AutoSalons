@@ -26,7 +26,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-//    private final CustomAuthenticationEntryPoint entryPoint;
+    private final CustomAuthenticationEntryPoint entryPoint;
     private final JwtAuthenticationFilter authenticationFilter;
     private final UserDetailsService userService;
 
@@ -61,7 +61,7 @@ public class SecurityConfig {
                         .permitAll()
                         .anyRequest().authenticated()
                 )
-//                .httpBasic(httpBasic -> httpBasic.authenticationEntryPoint(this.entryPoint))
+                .httpBasic(httpBasic -> httpBasic.authenticationEntryPoint(this.entryPoint))
                 .sessionManagement(m -> m.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authProvider())
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);

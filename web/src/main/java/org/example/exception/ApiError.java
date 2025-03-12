@@ -1,17 +1,19 @@
 package org.example.exception;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Data
 @Builder
-@AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiError {
     private int status;
     private String error;
     private String message;
     private LocalDateTime timestamp;
+    private Map<String, String> validationErrors;
 }

@@ -1,22 +1,22 @@
 package org.example.dto;
 
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
 @Builder
-public class CarDto {
-
+public class AddCarDto {
     private Integer id;
 
     @NotBlank(message = "Марка не должна быть пустой")
@@ -62,4 +62,12 @@ public class CarDto {
 
     @NotNull(message = "Автосалон не может быть пустым")
     private List<AutoSalonDto> autoSalons;
+
+    @NotNull(message = "Dealer id cannot be null")
+    private Integer dealerId;
+
+    @NotNull(message = "Price cannot be null")
+    @DecimalMin(value = "0.01", message = "Price must be greater than 0")
+    @Digits(integer = 10, fraction = 2, message = "Price must have up to 10 digits before the decimal and 2 after")
+    private BigDecimal price;
 }

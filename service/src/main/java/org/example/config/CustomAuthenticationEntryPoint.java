@@ -11,17 +11,17 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 
-//@Component
-//public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
-//
-//    private final HandlerExceptionResolver resolver;
-//
-//    public CustomAuthenticationEntryPoint(@Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver) {
-//        this.resolver = resolver;
-//    }
-//
-//    @Override
-//    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-//        this.resolver.resolveException(request, response, null, authException);
-//    }
-//}
+@Component
+public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
+    private final HandlerExceptionResolver resolver;
+
+    public CustomAuthenticationEntryPoint(@Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver) {
+        this.resolver = resolver;
+    }
+
+    @Override
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+        this.resolver.resolveException(request, response, null, authException);
+    }
+}

@@ -2,7 +2,6 @@ package org.example.service.impl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.example.exception.AuthenticationFailedException;
 import org.example.repository.UserRepository;
 import org.example.dto.LoginRequestDto;
 import org.example.dto.LoginResponseDto;
@@ -12,8 +11,6 @@ import org.example.dto.RegisterRequestDto;
 import org.example.model.Role;
 import org.example.model.User;
 import org.example.service.AuthService;
-import org.example.util.error.AuthenticationExceptionCode;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -49,11 +46,6 @@ public class AuthServiceImpl implements AuthService {
                         loginRequestDto.getPassword());
 
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
-//        try {
-//            authentication = authenticationManager.authenticate(authenticationToken);
-//        } catch (BadCredentialsException ex) {
-//            throw new AuthenticationFailedException(AuthenticationExceptionCode.INVALID_USERNAME_OR_PASSWORD.getMessage());
-//        }
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 

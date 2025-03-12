@@ -3,6 +3,7 @@ package org.example.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.aop.Loggable;
+import org.example.dto.AddCarDto;
 import org.example.dto.CarDto;
 import org.example.dto.CarRequest;
 import org.example.service.CarService;
@@ -27,6 +28,7 @@ public class CarController {
 
     private final CarService carService;
 
+    @Loggable
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public List<CarDto> getAllCars() {
@@ -48,8 +50,8 @@ public class CarController {
     @Loggable
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public void addCar(@Valid @RequestBody CarDto carDto) {
-        carService.addCar(carDto);
+    public void addCar(@Valid @RequestBody AddCarDto addCarDto) {
+        carService.addCar(addCarDto);
     }
 
     @PutMapping
@@ -58,6 +60,7 @@ public class CarController {
         carService.updateCar(carDto);
     }
 
+    @Loggable
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteCar(@PathVariable("id") int id) {

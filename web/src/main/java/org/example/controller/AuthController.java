@@ -33,7 +33,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public RefreshTokenResponseDto refresh(@RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {
-        return authService.refresh(refreshTokenRequestDto);
+    public ResponseEntity<RefreshTokenResponseDto> refresh(@RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {
+        return ResponseEntity.ok(authService.refresh(refreshTokenRequestDto));
     }
 }
