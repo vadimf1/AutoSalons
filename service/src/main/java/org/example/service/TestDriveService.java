@@ -1,16 +1,17 @@
 package org.example.service;
 
-import org.example.dto.TestDriveDto;
+import org.example.dto.request.TestDriveRequestDto;
+import org.example.dto.response.TestDriveResponseDto;
 
 import java.time.LocalDate;
 import java.util.List;
 
 public interface TestDriveService {
-    List<TestDriveDto> getAllTestDrives();
-    TestDriveDto getTestDriveById(int id);
-    void addTestDrive(TestDriveDto testDriveDto);
-    List<TestDriveDto> getTestDrivesByClientId(int clientId);
-    List<TestDriveDto> getTestDrivesByDate(LocalDate date);
-    void updateTestDrive(TestDriveDto testDriveDto);
+    List<TestDriveResponseDto> getAllTestDrives();
+    TestDriveResponseDto getTestDriveById(int id);
+    void addTestDrive(TestDriveRequestDto testDriveDto);
+    List<TestDriveResponseDto> getTestDrivesByClientId(int clientId);
+    List<TestDriveResponseDto> getTestDrivesByDate(LocalDate date);
+    void updateTestDrive(int id, TestDriveRequestDto testDriveDto);
     void deleteTestDriveById(int testDriveId);
 }

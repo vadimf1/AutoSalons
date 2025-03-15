@@ -2,11 +2,11 @@ package org.example.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.aop.Loggable;
-import org.example.dto.LoginRequestDto;
-import org.example.dto.LoginResponseDto;
-import org.example.dto.RefreshTokenRequestDto;
-import org.example.dto.RefreshTokenResponseDto;
-import org.example.dto.RegisterRequestDto;
+import org.example.dto.request.LoginRequestDto;
+import org.example.dto.response.LoginResponseDto;
+import org.example.dto.request.RefreshTokenRequestDto;
+import org.example.dto.response.RefreshTokenResponseDto;
+import org.example.dto.request.RegisterRequestDto;
 import org.example.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

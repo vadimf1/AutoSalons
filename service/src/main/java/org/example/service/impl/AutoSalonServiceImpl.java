@@ -33,19 +33,19 @@ public class AutoSalonServiceImpl implements AutoSalonService {
     public void addAutoSalon(AutoSalonRequestDto autoSalonDto) {
         AutoSalon autoSalon = autoSalonMapper.toEntity(autoSalonDto);
 
-        addRelationsToAutoSalon(autoSalon, autoSalonDto.getAddressId(), autoSalonDto.getContactIds());
+        addRelationsToAutoSalon(autoSalon, autoSalonDto);
 
         autoSalonRepository.save(autoSalon);
     }
 
-    private void addRelationsToAutoSalon(AutoSalon autoSalon, int addressId, List<Integer> contactIds) {
-        Address address = addressRepository.findById(addressId)
-                .orElseThrow(() -> new ServiceException(AddressExceptionCode.ADDRESS_NOT_FOUNT_BY_ID.getMessage() + addressId));
+    private void addRelationsToAutoSalon(AutoSalon autoSalon, AutoSalonRequestDto autoSalonDto) {
+        Address address = addressRepository.findById(autoSalonDto.getAddressId())
+                .orElseThrow(() -> new ServiceException(AddressExceptionCode.ADDRESS_NOT_FOUNT_BY_ID.getMessage() + autoSalonDto.getAddressId()));
 
         autoSalon.setAddress(address);
 
         autoSalon.setContacts(new HashSet<>());
-        for (Integer contactId : contactIds) {
+        for (Integer contactId : autoSalonDto.getContactIds()) {
             if (contactId == null) {
                 throw new ServiceException(ContactExceptionCode.ID_FIELD_EXPECTED_NULL.getMessage());
             }
@@ -75,7 +75,7 @@ public class AutoSalonServiceImpl implements AutoSalonService {
                         .orElseThrow(() -> new ServiceException(AutoSalonExceptionCode.AUTO_SALON_NOT_FOUNT_BY_ID.getMessage() + id));
 
         autoSalonMapper.updateEntityFromDto(autoSalonDto, autoSalon);
-        addRelationsToAutoSalon(autoSalon, autoSalonDto.getAddressId(), autoSalonDto.getContactIds());
+        addRelationsToAutoSalon(autoSalon, autoSalonDto);
 
         autoSalonRepository.save(autoSalon);
     }

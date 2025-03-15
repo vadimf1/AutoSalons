@@ -2,8 +2,10 @@ package org.example.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.dto.TestDriveDto;
+import org.example.dto.request.TestDriveRequestDto;
+import org.example.dto.response.TestDriveResponseDto;
 import org.example.service.TestDriveService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,43 +28,46 @@ public class TestDriveController {
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public List<TestDriveDto> getAllTestDrives() {
-        return testDriveService.getAllTestDrives();
+    public ResponseEntity<List<TestDriveResponseDto>> getAllTestDrives() {
+        return ResponseEntity.ok(testDriveService.getAllTestDrives());
     }
 
     @GetMapping("/client-id/{clientId}")
     @PreAuthorize("isAuthenticated()")
-    public List<TestDriveDto> getTestDrivesByClient(@PathVariable int clientId) {
-        return testDriveService.getTestDrivesByClientId(clientId);
+    public ResponseEntity<List<TestDriveResponseDto>> getTestDrivesByClient(@PathVariable int clientId) {
+        return ResponseEntity.ok(testDriveService.getTestDrivesByClientId(clientId));
     }
 
     @GetMapping("/date/{date}")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public List<TestDriveDto> getTestDrivesByDate(@PathVariable LocalDate date) {
-        return testDriveService.getTestDrivesByDate(date);
+    public ResponseEntity<List<TestDriveResponseDto>> getTestDrivesByDate(@PathVariable LocalDate date) {
+        return ResponseEntity.ok(testDriveService.getTestDrivesByDate(date));
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public TestDriveDto getTestDriveById(@PathVariable int id) {
-        return testDriveService.getTestDriveById(id);
+    public ResponseEntity<TestDriveResponseDto> getTestDriveById(@PathVariable int id) {
+        return ResponseEntity.ok(testDriveService.getTestDriveById(id));
     }
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public void createTestDrive(@Valid @RequestBody TestDriveDto testDriveDto) {
+    public ResponseEntity<String> createTestDrive(@Valid @RequestBody TestDriveRequestDto testDriveDto) {
         testDriveService.addTestDrive(testDriveDto);
+        return ResponseEntity.ok("Test drive added successfully");
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public void updateTestDrive(@Valid @RequestBody TestDriveDto testDriveDto) {
-        testDriveService.updateTestDrive(testDriveDto);
+    public ResponseEntity<String> updateTestDrive(@PathVariable int id, @Valid @RequestBody TestDriveRequestDto testDriveDto) {
+        testDriveService.updateTestDrive(id, testDriveDto);
+        return ResponseEntity.ok("Test drive updated successfully");
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public void deleteTestDrive(@PathVariable int id) {
+    public ResponseEntity<String> deleteTestDrive(@PathVariable int id) {
         testDriveService.deleteTestDriveById(id);
+        return ResponseEntity.ok("Test drive deleted successfully");
     }
 }

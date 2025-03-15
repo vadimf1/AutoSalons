@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @SuperBuilder
@@ -39,4 +40,11 @@ public class Dealer extends BaseEntity {
             inverseJoinColumns = @JoinColumn(name = "contact_id")
     )
     private Set<Contact> contacts;
+
+    public void addContact(Contact contact) {
+        if (contacts == null) {
+            contacts = new HashSet<>();
+        }
+        contacts.add(contact);
+    }
 }

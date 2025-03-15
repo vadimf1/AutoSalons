@@ -2,11 +2,12 @@ package org.example.service.impl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.example.dto.request.TestDriveRequestDto;
 import org.example.repository.AutoSalonRepository;
 import org.example.repository.CarRepository;
 import org.example.repository.ClientRepository;
 import org.example.repository.TestDriveRepository;
-import org.example.dto.TestDriveDto;
+import org.example.dto.response.TestDriveResponseDto;
 import org.example.exception.ServiceException;
 import org.example.mapper.TestDriveMapper;
 import org.example.model.TestDrive;
@@ -30,7 +31,7 @@ public class TestDriveServiceImpl implements TestDriveService {
     private final TestDriveMapper testDriveMapper;
 
     @Transactional
-    public List<TestDriveDto> getAllTestDrives() {
+    public List<TestDriveResponseDto> getAllTestDrives() {
         return testDriveRepository.findAll()
                 .stream()
                 .map(testDriveMapper::toDto)
@@ -38,7 +39,7 @@ public class TestDriveServiceImpl implements TestDriveService {
     }
 
     @Transactional
-    public TestDriveDto getTestDriveById(int testDriveId) {
+    public TestDriveResponseDto getTestDriveById(int testDriveId) {
         return testDriveRepository.findById(testDriveId)
                 .map(testDriveMapper::toDto)
                 .orElseThrow(() -> new ServiceException(
@@ -46,42 +47,30 @@ public class TestDriveServiceImpl implements TestDriveService {
     }
 
     @Transactional
-    public void addTestDrive(TestDriveDto testDriveDto) {
-        if (testDriveDto.getId() != null) {
-            throw new ServiceException(TestDriveExceptionCode.ID_FIELD_EXPECTED_NULL.getMessage());
-        }
-
+    public void addTestDrive(TestDriveRequestDto testDriveDto) {
         TestDrive testDrive = testDriveMapper.toEntity(testDriveDto);
 
-        if (testDriveDto.getAutoSalon().getId() == null) {
-            throw new ServiceException(TestDriveExceptionCode.AUTO_SALON_ID_REQUIRED.getMessage());
-        }
-
-        testDrive.setAutoSalon(autoSalonRepository.findById(testDriveDto.getAutoSalon().getId())
-                .orElseThrow(() -> new ServiceException(
-                        AutoSalonExceptionCode.AUTO_SALON_NOT_FOUNT_BY_ID.getMessage() + testDriveDto.getClient().getId())));
-
-        if (testDriveDto.getClient().getId() == null) {
-            throw new ServiceException(TestDriveExceptionCode.CLIENT_ID_REQUIRED.getMessage());
-        }
-
-        testDrive.setClient(clientRepository.findById(testDriveDto.getClient().getId())
-                .orElseThrow(() -> new ServiceException(
-                        ClientExceptionCode.CLIENT_NOT_FOUND_BY_ID.getMessage() + testDriveDto.getCar().getId())));
-
-        if (testDriveDto.getCar().getId() == null) {
-            throw new ServiceException(TestDriveExceptionCode.CAR_ID_REQUIRED.getMessage());
-        }
-
-        testDrive.setCar(carRepository.findById(testDriveDto.getCar().getId())
-                .orElseThrow(() -> new ServiceException(
-                        CarExceptionCode.CAR_NOT_FOUNT_BY_ID.getMessage() + testDriveDto.getCar().getId())));
+        addRelationsToTestDrive(testDrive, testDriveDto);
 
         testDriveRepository.save(testDrive);
     }
 
+    private void addRelationsToTestDrive(TestDrive testDrive, TestDriveRequestDto testDriveDto) {
+        testDrive.setAutoSalon(autoSalonRepository.findById(testDriveDto.getAutoSalonId())
+                .orElseThrow(() -> new ServiceException(
+                        AutoSalonExceptionCode.AUTO_SALON_NOT_FOUNT_BY_ID.getMessage() + testDriveDto.getClientId())));
+
+        testDrive.setClient(clientRepository.findById(testDriveDto.getClientId())
+                .orElseThrow(() -> new ServiceException(
+                        ClientExceptionCode.CLIENT_NOT_FOUND_BY_ID.getMessage() + testDriveDto.getCarId())));
+
+        testDrive.setCar(carRepository.findById(testDriveDto.getCarId())
+                .orElseThrow(() -> new ServiceException(
+                        CarExceptionCode.CAR_NOT_FOUNT_BY_ID.getMessage() + testDriveDto.getCarId())));
+    }
+
     @Transactional
-    public List<TestDriveDto> getTestDrivesByClientId(int clientId) {
+    public List<TestDriveResponseDto> getTestDrivesByClientId(int clientId) {
         return testDriveRepository.findByClient_Id(clientId)
                 .stream()
                 .map(testDriveMapper::toDto)
@@ -89,7 +78,7 @@ public class TestDriveServiceImpl implements TestDriveService {
     }
 
     @Transactional
-    public List<TestDriveDto> getTestDrivesByDate(LocalDate date) {
+    public List<TestDriveResponseDto> getTestDrivesByDate(LocalDate date) {
         return testDriveRepository.findByTestDriveDate(date)
                 .stream()
                 .map(testDriveMapper::toDto)
@@ -97,8 +86,14 @@ public class TestDriveServiceImpl implements TestDriveService {
     }
 
     @Transactional
-    public void updateTestDrive(TestDriveDto updatedTestDriveDto) {
-        testDriveRepository.save(testDriveMapper.toEntity(updatedTestDriveDto));
+    public void updateTestDrive(int id, TestDriveRequestDto testDriveDto) {
+        TestDrive testDrive = testDriveRepository.findById(id)
+                        .orElseThrow(() -> new ServiceException(TestDriveExceptionCode.TEST_DRIVE_NOT_FOUNT_BY_ID.getMessage() + id));
+
+        testDriveMapper.updateEntityFromDto(testDriveDto, testDrive);
+        addRelationsToTestDrive(testDrive, testDriveDto);
+
+        testDriveRepository.save(testDrive);
     }
 
     @Transactional

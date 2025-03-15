@@ -48,7 +48,7 @@ public class ClientServiceImpl implements ClientService {
             addUserToClient(client, clientDto.getUserId());
         }
 
-        addRelationsToClient(client, clientDto.getPersonId(), clientDto.getAddressId());
+        addRelationsToClient(client, clientDto);
 
         clientRepository.save(client);
     }
@@ -60,14 +60,14 @@ public class ClientServiceImpl implements ClientService {
         client.setUser(user);
     }
 
-    private void addRelationsToClient(Client client, int personId, int addressId) {
-        Person person = personRepository.findById(personId)
-                .orElseThrow(() -> new ServiceException(PersonExceptionCode.PERSON_NOT_FOUNT_BY_ID.getMessage() + personId));
+    private void addRelationsToClient(Client client, ClientRequestDto clientDto) {
+        Person person = personRepository.findById(clientDto.getPersonId())
+                .orElseThrow(() -> new ServiceException(PersonExceptionCode.PERSON_NOT_FOUNT_BY_ID.getMessage() + clientDto.getPersonId()));
 
         client.setPerson(person);
 
-        Address address = addressRepository.findById(addressId)
-                .orElseThrow(() -> new ServiceException(AddressExceptionCode.ADDRESS_NOT_FOUNT_BY_ID.getMessage() + addressId));
+        Address address = addressRepository.findById(clientDto.getAddressId())
+                .orElseThrow(() -> new ServiceException(AddressExceptionCode.ADDRESS_NOT_FOUNT_BY_ID.getMessage() + clientDto.getAddressId()));
 
         client.setAddress(address);
     }
@@ -87,16 +87,16 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Transactional
-    public void updateClient(int id, ClientRequestDto clientRequestDto) {
+    public void updateClient(int id, ClientRequestDto clientDto) {
         Client client = clientRepository.findById(id)
                 .orElseThrow(() -> new ServiceException(ClientExceptionCode.CLIENT_NOT_FOUND_BY_ID.getMessage() + id));
 
-        clientMapper.updateEntityFromDto(clientRequestDto, client);
+        clientMapper.updateEntityFromDto(clientDto, client);
 
-        if (clientRequestDto.getUserId() != null) {
-            addUserToClient(client, clientRequestDto.getUserId());
+        if (clientDto.getUserId() != null) {
+            addUserToClient(client, clientDto.getUserId());
         }
-        addRelationsToClient(client, clientRequestDto.getPersonId(), clientRequestDto.getAddressId());
+        addRelationsToClient(client, clientDto);
 
         clientRepository.save(client);
     }

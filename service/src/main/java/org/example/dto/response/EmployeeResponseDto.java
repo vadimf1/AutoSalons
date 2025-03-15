@@ -3,21 +3,14 @@ package org.example.dto.response;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDate;
-
 @Data
 @Builder
-public class ClientResponseDto {
-
+public class EmployeeResponseDto {
     private Integer id;
-
     private PersonResponseDto person;
-
     private UserResponseDto user;
-
+    private AutoSalonResponseDto autoSalon;
     private AddressResponseDto address;
-
-    private LocalDate birthDate;
-
-    private String passportNumber;
+    private String position;
+    private double salary;
 }

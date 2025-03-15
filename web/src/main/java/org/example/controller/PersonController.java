@@ -3,8 +3,10 @@ package org.example.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.aop.Loggable;
-import org.example.dto.PersonDto;
+import org.example.dto.request.PersonRequestDto;
+import org.example.dto.response.PersonResponseDto;
 import org.example.service.PersonService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,32 +21,35 @@ public class PersonController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public List<PersonDto> getAllPersons() {
-        return personService.getAllPersons();
+    public ResponseEntity<List<PersonResponseDto>> getAllPersons() {
+        return ResponseEntity.ok(personService.getAllPersons());
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public PersonDto getPersonById(@PathVariable int id) {
-        return personService.getPersonById(id);
+    public ResponseEntity<PersonResponseDto> getPersonById(@PathVariable int id) {
+        return ResponseEntity.ok(personService.getPersonById(id));
     }
 
     @Loggable
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public void addPerson(@Valid @RequestBody PersonDto personDto) {
+    public ResponseEntity<String> addPerson(@Valid @RequestBody PersonRequestDto personDto) {
         personService.addPerson(personDto);
+        return ResponseEntity.ok("Person added successfully");
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public void updatePerson(@Valid @RequestBody PersonDto personDto) {
-        personService.updatePerson(personDto);
+    public ResponseEntity<String> updatePerson(@PathVariable int id, @Valid @RequestBody PersonRequestDto personDto) {
+        personService.updatePerson(id, personDto);
+        return ResponseEntity.ok("Person updated successfully");
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public void deletePerson(@PathVariable("id") int id) {
+    public ResponseEntity<String> deletePerson(@PathVariable("id") int id) {
         personService.deletePersonById(id);
+        return ResponseEntity.ok("Person deleted successfully");
     }
 }

@@ -2,8 +2,10 @@ package org.example.service.impl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.example.dto.request.UserRequestDto;
+import org.example.model.User;
 import org.example.repository.UserRepository;
-import org.example.dto.UserDto;
+import org.example.dto.response.UserResponseDto;
 import org.example.exception.ServiceException;
 import org.example.mapper.UserMapper;
 import org.example.service.UserService;
@@ -22,15 +24,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserMapper userMapper;
 
     @Transactional
-    public void addUser(UserDto userDto) {
-        if (userDto.getId() != null) {
-            throw new ServiceException(UserExceptionCode.ID_FIELD_EXPECTED_NULL.getMessage());
-        }
+    public void addUser(UserRequestDto userDto) {
         userRepository.save(userMapper.toEntity(userDto));
     }
 
     @Transactional
-    public List<UserDto> getAllUsers() {
+    public List<UserResponseDto> getAllUsers() {
         return userRepository.findAll()
                 .stream()
                 .map(userMapper::toDto)
@@ -38,7 +37,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Transactional
-    public UserDto getUserById(int userId) {
+    public UserResponseDto getUserById(int userId) {
         return userRepository.findById(userId)
                 .map(userMapper::toDto)
                 .orElseThrow(() -> new ServiceException(
@@ -46,8 +45,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Transactional
-    public void updateUser(UserDto updatedUserDto) {
-        userRepository.save(userMapper.toEntity(updatedUserDto));
+    public void updateUser(int id, UserRequestDto userDto) {
+        User user = userRepository.findById(id)
+                        .orElseThrow(() -> new ServiceException(UserExceptionCode.USER_NOT_FOUND_BY_ID.getMessage() + id));
+
+        userMapper.updateEntityFromDto(userDto, user);
+
+        userRepository.save(user);
     }
 
     @Transactional

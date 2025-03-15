@@ -1,4 +1,4 @@
-package org.example.dto;
+package org.example.dto.request;
 
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -10,30 +10,25 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
-import org.example.dto.response.AutoSalonResponseDto;
-import org.example.dto.response.CarResponseDto;
-import org.example.dto.response.ClientResponseDto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
 @Builder
-public class SaleDto {
-
-    private Integer id;
+public class SaleRequestDto {
 
     @NotNull(message = "Auto salon cannot be null")
-    private AutoSalonResponseDto autoSalon;
+    private Integer autoSalonId;
 
     @NotNull(message = "Client cannot be null")
-    private ClientResponseDto client;
+    private Integer clientId;
 
     @NotNull(message = "Car cannot be null")
-    private CarResponseDto car;
+    private Integer carId;
 
     @NotNull(message = "Employee cannot be null")
-    private EmployeeDto employee;
+    private Integer employeeId;
 
     @NotNull(message = "Sale date cannot be null")
     @PastOrPresent(message = "Sale date must be in the past or present")

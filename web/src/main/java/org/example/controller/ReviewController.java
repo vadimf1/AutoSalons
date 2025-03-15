@@ -2,8 +2,10 @@ package org.example.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.dto.ReviewDto;
+import org.example.dto.request.ReviewRequestDto;
+import org.example.dto.response.ReviewResponseDto;
 import org.example.service.ReviewService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,49 +29,52 @@ public class ReviewController {
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public List<ReviewDto> getAllReviews() {
-        return reviewService.getAllReviews();
+    public ResponseEntity<List<ReviewResponseDto>> getAllReviews() {
+        return ResponseEntity.ok(reviewService.getAllReviews());
     }
 
     @GetMapping("/client-id/{clientId}")
     @PreAuthorize("isAuthenticated()")
-    public List<ReviewDto> getReviewByClientId(@PathVariable int clientId) {
-        return reviewService.getReviewByClientId(clientId);
+    public ResponseEntity<List<ReviewResponseDto>> getReviewByClientId(@PathVariable int clientId) {
+        return ResponseEntity.ok(reviewService.getReviewByClientId(clientId));
     }
 
     @GetMapping("/created-at/{createdAt}")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public List<ReviewDto> getReviewsByDate(@PathVariable LocalDate createdAt) {
-        return reviewService.getReviewsByDate(createdAt);
+    public ResponseEntity<List<ReviewResponseDto>> getReviewsByDate(@PathVariable LocalDate createdAt) {
+        return ResponseEntity.ok(reviewService.getReviewsByDate(createdAt));
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ReviewDto getReviewById(@PathVariable("id") int id) {
-        return reviewService.getReviewById(id);
+    public ResponseEntity<ReviewResponseDto> getReviewById(@PathVariable("id") int id) {
+        return ResponseEntity.ok(reviewService.getReviewById(id));
     }
 
     @GetMapping("/rating/{rating}")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public List<ReviewDto> getReviewsByRating(@PathVariable int rating) {
-        return reviewService.getReviewsByRating(rating);
+    public ResponseEntity<List<ReviewResponseDto>> getReviewsByRating(@PathVariable int rating) {
+        return ResponseEntity.ok(reviewService.getReviewsByRating(rating));
     }
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public void createReview(@Valid @RequestBody ReviewDto reviewDto) {
+    public ResponseEntity<String> createReview(@Valid @RequestBody ReviewRequestDto reviewDto) {
         reviewService.addReview(reviewDto);
+        return ResponseEntity.ok("Review added successfully");
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public void updateReview(@Valid @RequestBody ReviewDto reviewDto) {
-        reviewService.updateReview(reviewDto);
+    public ResponseEntity<String> updateReview(@PathVariable int id, @Valid @RequestBody ReviewRequestDto reviewDto) {
+        reviewService.updateReview(id, reviewDto);
+        return ResponseEntity.ok("Review updated successfully");
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public void deleteReview(@PathVariable int id) {
+    public ResponseEntity<String> deleteReview(@PathVariable int id) {
         reviewService.deleteReviewById(id);
+        return ResponseEntity.ok("Review deleted successfully");
     }
 }

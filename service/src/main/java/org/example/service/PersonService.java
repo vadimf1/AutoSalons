@@ -1,13 +1,14 @@
 package org.example.service;
 
-import org.example.dto.PersonDto;
+import org.example.dto.request.PersonRequestDto;
+import org.example.dto.response.PersonResponseDto;
 
 import java.util.List;
 
 public interface PersonService {
-    void addPerson(PersonDto personDto);
-    List<PersonDto> getAllPersons();
-    PersonDto getPersonById(int id);
-    void updatePerson(PersonDto personDto);
+    void addPerson(PersonRequestDto personDto);
+    List<PersonResponseDto> getAllPersons();
+    PersonResponseDto getPersonById(int id);
+    void updatePerson(int id, PersonRequestDto personDto);
     void deletePersonById(int id);
 }

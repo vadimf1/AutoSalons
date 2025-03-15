@@ -20,5 +20,6 @@ public class AutoSalonRequestDto {
     private Integer addressId;
 
     @NotNull(message = "Contacts cannot be null")
+    @Size(min = 1, message = "Список контактов не может быть пустым")
     private List<Integer> contactIds;
 }

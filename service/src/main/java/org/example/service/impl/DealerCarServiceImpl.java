@@ -30,20 +30,20 @@ public class DealerCarServiceImpl implements DealerCarService {
     public void addDealerCar(DealerCarRequestDto dealerCarDto) {
         DealerCar dealerCar = dealerCarMapper.toEntity(dealerCarDto);
 
-        addRelationsToDealerCar(dealerCar, dealerCarDto.getDealerId(), dealerCarDto.getCarId());
+        addRelationsToDealerCar(dealerCar, dealerCarDto);
 
         dealerCarRepository.save(dealerCar);
     }
 
-    private void addRelationsToDealerCar(DealerCar dealerCar, int dealerId, int carId) {
+    private void addRelationsToDealerCar(DealerCar dealerCar, DealerCarRequestDto dealerCarDto) {
         dealerCar.setDealer(
-                dealerRepository.findById(dealerId)
-                        .orElseThrow(() -> new ServiceException(DealerExceptionCode.DEALER_NOT_FOUNT_BY_ID.getMessage() + dealerId))
+                dealerRepository.findById(dealerCarDto.getDealerId())
+                        .orElseThrow(() -> new ServiceException(DealerExceptionCode.DEALER_NOT_FOUNT_BY_ID.getMessage() + dealerCarDto.getDealerId()))
         );
 
         dealerCar.setCar(
-                carRepository.findById(carId)
-                        .orElseThrow(() -> new ServiceException(CarExceptionCode.CAR_NOT_FOUNT_BY_ID.getMessage() + carId))
+                carRepository.findById(dealerCarDto.getCarId())
+                        .orElseThrow(() -> new ServiceException(CarExceptionCode.CAR_NOT_FOUNT_BY_ID.getMessage() + dealerCarDto.getCarId()))
         );
     }
 
@@ -65,7 +65,7 @@ public class DealerCarServiceImpl implements DealerCarService {
                 .orElseThrow(() -> new ServiceException(DealerCarExceptionCode.DEALER_CAR_NOT_FOUND_BY_ID.getMessage() + id));
 
         dealerCarMapper.updateEntityFromDto(dealerCarDto, dealerCar);
-        addRelationsToDealerCar(dealerCar, dealerCarDto.getDealerId(), dealerCarDto.getCarId());
+        addRelationsToDealerCar(dealerCar, dealerCarDto);
 
         dealerCarRepository.save(dealerCar);
     }
