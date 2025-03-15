@@ -2,8 +2,10 @@ package org.example.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.dto.ClientDto;
+import org.example.dto.request.ClientRequestDto;
+import org.example.dto.response.ClientResponseDto;
 import org.example.service.ClientService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,37 +27,40 @@ public class ClientController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public List<ClientDto> getAllClients() {
-        return clientService.getAllClients();
+    public ResponseEntity<List<ClientResponseDto>> getAllClients() {
+        return ResponseEntity.ok(clientService.getAllClients());
     }
 
     @GetMapping("/passport-number/{passportNumber}")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public ClientDto getClientByPassport(@PathVariable String passportNumber) {
-        return clientService.getClientByPassportNumber(passportNumber);
+    public ResponseEntity<ClientResponseDto> getClientByPassport(@PathVariable String passportNumber) {
+        return ResponseEntity.ok(clientService.getClientByPassportNumber(passportNumber));
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public ClientDto getClientById(@PathVariable int id) {
-        return clientService.getClientById(id);
+    public ResponseEntity<ClientResponseDto> getClientById(@PathVariable int id) {
+        return ResponseEntity.ok(clientService.getClientById(id));
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public void createClient(@Valid @RequestBody ClientDto clientDto) {
-        clientService.addClient(clientDto);
+    public ResponseEntity<String> createClient(@Valid @RequestBody ClientRequestDto clientRequestDto) {
+        clientService.addClient(clientRequestDto);
+        return ResponseEntity.ok("Client created successfully");
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public void updateClient(@Valid @RequestBody ClientDto updatedClientDto) {
-        clientService.updateClient(updatedClientDto);
+    public ResponseEntity<String> updateClient(@PathVariable int id, @Valid @RequestBody ClientRequestDto clientRequestDto) {
+        clientService.updateClient(id, clientRequestDto);
+        return ResponseEntity.ok("Client updated successfully");
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public void deleteClient(@PathVariable int id) {
+    public ResponseEntity<String> deleteClient(@PathVariable int id) {
         clientService.deleteClientById(id);
+        return ResponseEntity.ok("Client deleted successfully");
     }
 }

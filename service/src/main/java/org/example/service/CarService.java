@@ -1,22 +1,22 @@
 package org.example.service;
 
-import org.example.dto.AddCarDto;
-import org.example.dto.CarDto;
-import org.example.dto.CarRequest;
-import org.example.model.Car;
+import org.example.dto.request.AddCarDto;
+import org.example.dto.request.UpdateCarDto;
+import org.example.dto.response.CarResponseDto;
+import org.example.dto.request.CarRequest;
 
 import java.util.List;
 
 public interface CarService {
     void addCar(AddCarDto addCarDto);
 
-    List<CarDto> getAllCars();
+    List<CarResponseDto> getAllCars();
 
-    CarDto getCarById(int carId);
+    CarResponseDto getCarById(int carId);
 
-    List<CarDto> searchCars(CarRequest carRequest);
+    List<CarResponseDto> searchCars(CarRequest carRequest);
 
-    void updateCar(CarDto updatedCarDto);
+    void updateCar(int carId, UpdateCarDto updateCarDto);
 
     void deleteCarById(int carId);
 }

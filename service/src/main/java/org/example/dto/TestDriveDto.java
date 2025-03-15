@@ -2,10 +2,11 @@ package org.example.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.example.dto.response.AutoSalonResponseDto;
+import org.example.dto.response.CarResponseDto;
+import org.example.dto.response.ClientResponseDto;
 
 import java.time.LocalDate;
 
@@ -16,13 +17,13 @@ public class TestDriveDto {
     private Integer id;
 
     @NotNull(message = "ID автосалона обязателен")
-    private AutoSalonDto autoSalon;
+    private AutoSalonResponseDto autoSalon;
 
     @NotNull(message = "ID автомобиля обязателен")
-    private CarDto car;
+    private CarResponseDto car;
 
     @NotNull(message = "ID клиента обязателен")
-    private ClientDto client;
+    private ClientResponseDto client;
 
     @NotNull(message = "Дата тест-драйва обязательна")
     private LocalDate testDriveDate;

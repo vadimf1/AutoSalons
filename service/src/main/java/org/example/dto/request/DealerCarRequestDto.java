@@ -1,4 +1,4 @@
-package org.example.dto;
+package org.example.dto.request;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
@@ -10,15 +10,13 @@ import java.math.BigDecimal;
 
 @Data
 @Builder
-public class DealerCarDto {
-
-    private Integer id;
+public class DealerCarRequestDto {
 
     @NotNull(message = "Dealer cannot be null")
-    private DealerDto dealer;
+    private Integer dealerId;
 
     @NotNull(message = "Car cannot be null")
-    private CarDto car;
+    private Integer carId;
 
     @NotNull(message = "Price cannot be null")
     @DecimalMin(value = "0.01", message = "Price must be greater than 0")

@@ -2,9 +2,11 @@ package org.example.service.impl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.example.dto.AddressDto;
+import org.example.dto.request.AddressRequestDto;
+import org.example.dto.response.AddressResponseDto;
 import org.example.exception.ServiceException;
 import org.example.mapper.AddressMapper;
+import org.example.model.Address;
 import org.example.repository.AddressRepository;
 import org.example.service.AddressService;
 import org.example.util.error.AddressExceptionCode;
@@ -19,29 +21,30 @@ public class AddressServiceImpl implements AddressService {
     private final AddressRepository addressRepository;
     private final AddressMapper addressMapper;
 
-    public void addAddress(AddressDto addressDto) {
-        if (addressDto.getId() != null) {
-            throw new ServiceException(AddressExceptionCode.ID_FIELD_EXPECTED_NULL.getMessage());
-        }
+    public void addAddress(AddressRequestDto addressDto) {
         addressRepository.save(addressMapper.toEntity(addressDto));
     }
 
-    public List<AddressDto> getAllAddresses() {
+    public List<AddressResponseDto> getAllAddresses() {
         return addressRepository.findAll()
                 .stream()
                 .map(addressMapper::toDto)
                 .toList();
     }
 
-    public AddressDto getAddressById(int id) {
+    public AddressResponseDto getAddressById(int id) {
         return addressRepository.findById(id)
                 .map(addressMapper::toDto)
                 .orElseThrow(() -> new ServiceException(AddressExceptionCode.ADDRESS_NOT_FOUNT_BY_ID.getMessage() + id));
     }
 
-    public void updateAddress(AddressDto addressDto) {
-        getAddressById(addressDto.getId());
-        addressRepository.save(addressMapper.toEntity(addressDto));
+    public void updateAddress(int id, AddressRequestDto addressDto) {
+        Address address = addressRepository.findById(id)
+                        .orElseThrow(() -> new ServiceException(AddressExceptionCode.ID_FIELD_EXPECTED_NULL.getMessage() + id));
+
+        addressMapper.updateEntityFromDto(addressDto, address);
+
+        addressRepository.save(address);
     }
 
     public void deleteAddressById(int id) {

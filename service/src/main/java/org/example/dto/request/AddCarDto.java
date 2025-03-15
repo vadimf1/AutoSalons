@@ -1,23 +1,22 @@
-package org.example.dto;
+package org.example.dto.request;
 
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
 @Builder
-public class CarDto {
-
-    private Integer id;
+public class AddCarDto {
 
     @NotBlank(message = "Марка не должна быть пустой")
     @Size(max = 50, message = "Максимальная длина марки — 50 символов")
@@ -61,5 +60,14 @@ public class CarDto {
     private String status;
 
     @NotNull(message = "Автосалон не может быть пустым")
-    private List<AutoSalonDto> autoSalons;
+    @Size(min = 1, message = "Список автосалонов не может быть пустым")
+    private List<Integer> autoSalonIds;
+
+    @NotNull(message = "Dealer id cannot be null")
+    private Integer dealerId;
+
+    @NotNull(message = "Price cannot be null")
+    @DecimalMin(value = "0.01", message = "Price must be greater than 0")
+    @Digits(integer = 10, fraction = 2, message = "Price must have up to 10 digits before the decimal and 2 after")
+    private BigDecimal price;
 }

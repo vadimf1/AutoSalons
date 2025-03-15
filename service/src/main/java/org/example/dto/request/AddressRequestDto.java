@@ -1,17 +1,10 @@
-package org.example.dto;
+package org.example.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@Builder
-public class AddressDto {
-    private Integer id;
+public class AddressRequestDto {
 
     @NotBlank(message = "Страна обязательна")
     @Size(max = 50, message = "Страна должна быть не длиннее 50 символов")

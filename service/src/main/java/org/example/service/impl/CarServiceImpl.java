@@ -2,8 +2,9 @@ package org.example.service.impl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.example.dto.AddCarDto;
-import org.example.mapper.AddCarMapper;
+import org.example.dto.request.AddCarDto;
+import org.example.dto.request.UpdateCarDto;
+import org.example.dto.response.CarResponseDto;
 import org.example.model.Dealer;
 import org.example.model.DealerCar;
 import org.example.repository.AutoSalonRepository;
@@ -11,16 +12,12 @@ import org.example.repository.CarRepository;
 import org.example.repository.DealerCarRepository;
 import org.example.repository.DealerRepository;
 import org.example.repository.specification.CarSpecification;
-import org.example.dto.AutoSalonDto;
-import org.example.dto.CarDto;
-import org.example.dto.CarRequest;
+import org.example.dto.request.CarRequest;
 import org.example.exception.ServiceException;
 import org.example.mapper.CarMapper;
 import org.example.model.AutoSalon;
 import org.example.model.Car;
 import org.example.service.CarService;
-import org.example.service.DealerCarService;
-import org.example.service.DealerService;
 import org.example.util.error.AutoSalonExceptionCode;
 import org.example.util.error.CarExceptionCode;
 import org.example.util.error.DealerExceptionCode;
@@ -35,29 +32,15 @@ public class CarServiceImpl implements CarService {
     private final CarRepository carRepository;
     private final AutoSalonRepository autoSalonRepository;
     private final CarMapper carMapper;
-    private final AddCarMapper addCarMapper;
     private final DealerCarRepository dealerCarRepository;
     private final DealerRepository dealerRepository;
 
     @Transactional
     public void addCar(AddCarDto addCarDto) {
-        if (addCarDto.getId() != null) {
-            throw new ServiceException(CarExceptionCode.ID_FIELD_EXPECTED_NULL.getMessage());
-        }
+        Car car = carMapper.toEntity(addCarDto);
 
-        Car car = addCarMapper.toEntity(addCarDto);
-        car.setAutoSalons(new HashSet<>());
+        addAutoSalonsToCar(car, addCarDto.getAutoSalonIds());
 
-        for (AutoSalonDto autoSalonDto : addCarDto.getAutoSalons()) {
-            if (autoSalonDto.getId() == null) {
-                throw new ServiceException(CarExceptionCode.ID_FIELD_EXPECTED_NULL.getMessage());
-            }
-
-            AutoSalon autoSalon = autoSalonRepository.findById(autoSalonDto.getId())
-                    .orElseThrow(() -> new ServiceException(AutoSalonExceptionCode.AUTO_SALON_NOT_FOUNT_BY_ID.getMessage() + autoSalonDto.getId()));
-
-            car.addAutoSalon(autoSalon);
-        }
         carRepository.save(car);
 
         Dealer dealer = dealerRepository.findById(addCarDto.getDealerId())
@@ -72,8 +55,21 @@ public class CarServiceImpl implements CarService {
         dealerCarRepository.save(dealerCar);
     }
 
+    private void addAutoSalonsToCar(Car car, List<Integer> autoSalonIds) {
+        for (Integer autoSalonId : autoSalonIds) {
+            if (autoSalonId == null) {
+                throw new ServiceException(CarExceptionCode.ID_FIELD_EXPECTED_NULL.getMessage());
+            }
+
+            AutoSalon autoSalon = autoSalonRepository.findById(autoSalonId)
+                    .orElseThrow(() -> new ServiceException(AutoSalonExceptionCode.AUTO_SALON_NOT_FOUNT_BY_ID.getMessage() + autoSalonId));
+
+            car.addAutoSalon(autoSalon);
+        }
+    }
+
     @Transactional
-    public List<CarDto> getAllCars() {
+    public List<CarResponseDto> getAllCars() {
         return carRepository.findAll()
                 .stream()
                 .map(carMapper::toDto)
@@ -81,14 +77,14 @@ public class CarServiceImpl implements CarService {
     }
 
     @Transactional
-    public CarDto getCarById(int carId) {
+    public CarResponseDto getCarById(int carId) {
         return carRepository.findById(carId)
                 .map(carMapper::toDto)
                 .orElseThrow(() -> new ServiceException(CarExceptionCode.CAR_NOT_FOUNT_BY_ID.getMessage() + carId));
     }
 
     @Transactional
-    public List<CarDto> searchCars(CarRequest carRequest) {
+    public List<CarResponseDto> searchCars(CarRequest carRequest) {
         return carRepository.findAll(CarSpecification.filterBy(
                         carRequest.getVin(),
                         carRequest.getMake(),
@@ -101,15 +97,23 @@ public class CarServiceImpl implements CarService {
     }
 
     @Transactional
-    public void updateCar(CarDto updatedCarDto) {
-        if (updatedCarDto.getId() == null) {
-            throw new ServiceException(CarExceptionCode.ID_FIELD_NOT_NULL.getMessage());
-        }
-        carRepository.save(carMapper.toEntity(updatedCarDto));
+    public void updateCar(int carId, UpdateCarDto updateCarDto) {
+        Car car = carRepository.findById(carId)
+                        .orElseThrow(() -> new ServiceException(CarExceptionCode.CAR_NOT_FOUNT_BY_ID.getMessage() + carId));
+
+        carMapper.updateEntityFromDto(updateCarDto, car);
+
+        car.setAutoSalons(new HashSet<>());
+        addAutoSalonsToCar(car, updateCarDto.getAutoSalonIds());
+
+        carRepository.save(car);
     }
 
     @Transactional
     public void deleteCarById(int carId) {
+        carRepository.findById(carId)
+                        .orElseThrow(() -> new ServiceException(CarExceptionCode.CAR_NOT_FOUNT_BY_ID.getMessage() + carId));
         carRepository.deleteById(carId);
     }
+
 }

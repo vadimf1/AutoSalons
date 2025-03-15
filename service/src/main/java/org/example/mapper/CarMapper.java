@@ -1,13 +1,15 @@
 package org.example.mapper;
 
-import org.example.dto.CarDto;
+import org.example.dto.request.AddCarDto;
+import org.example.dto.request.UpdateCarDto;
+import org.example.dto.response.CarResponseDto;
 import org.example.model.Car;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface CarMapper {
-    CarDto toDto(Car car);
-    @Mapping(target = "autoSalons", ignore = true)
-    Car toEntity(CarDto carDto);
+    CarResponseDto toDto(Car car);
+    Car toEntity(AddCarDto AddCarDto);
+    void updateEntityFromDto(UpdateCarDto updateCarDto, @MappingTarget Car car);
 }

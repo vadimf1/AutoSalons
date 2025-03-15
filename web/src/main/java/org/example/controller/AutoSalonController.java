@@ -3,8 +3,10 @@ package org.example.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.aop.Loggable;
-import org.example.dto.AutoSalonDto;
+import org.example.dto.request.AutoSalonRequestDto;
+import org.example.dto.response.AutoSalonResponseDto;
 import org.example.service.AutoSalonService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,32 +21,35 @@ public class AutoSalonController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public List<AutoSalonDto> getAllAutoSalons() {
-        return autoSalonService.getAllAutoSalons();
+    public ResponseEntity<List<AutoSalonResponseDto>> getAllAutoSalons() {
+        return ResponseEntity.ok(autoSalonService.getAllAutoSalons());
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public AutoSalonDto getAutoSalonById(@PathVariable int id) {
-        return autoSalonService.getAutoSalonById(id);
+    public ResponseEntity<AutoSalonResponseDto> getAutoSalonById(@PathVariable int id) {
+        return ResponseEntity.ok(autoSalonService.getAutoSalonById(id));
     }
 
     @Loggable
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public void addAutoSalon(@Valid @RequestBody AutoSalonDto autoSalonDto) {
+    public ResponseEntity<String> addAutoSalon(@Valid @RequestBody AutoSalonRequestDto autoSalonDto) {
         autoSalonService.addAutoSalon(autoSalonDto);
+        return ResponseEntity.ok("Auto salon added successfully");
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public void updateAutoSalon(@Valid @RequestBody AutoSalonDto autoSalonDto) {
-        autoSalonService.updateAutoSalon(autoSalonDto);
+    public ResponseEntity<String> updateAutoSalon(@PathVariable int id, @Valid @RequestBody AutoSalonRequestDto autoSalonDto) {
+        autoSalonService.updateAutoSalon(id, autoSalonDto);
+        return ResponseEntity.ok("Auto salon updated successfully");
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public void deleteAutoSalon(@PathVariable("id") int id) {
+    public ResponseEntity<String> deleteAutoSalon(@PathVariable("id") int id) {
         autoSalonService.deleteAutoSalonById(id);
+        return ResponseEntity.ok("Auto salon deleted successfully");
     }
 }

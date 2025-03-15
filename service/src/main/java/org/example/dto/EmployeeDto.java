@@ -6,6 +6,8 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
+import org.example.dto.response.AddressResponseDto;
+import org.example.dto.response.AutoSalonResponseDto;
 
 @Data
 @Builder
@@ -20,9 +22,9 @@ public class EmployeeDto {
     private UserDto user;
 
     @NotNull(message = "Auto salon cannot be null")
-    private AutoSalonDto autoSalon;
+    private AutoSalonResponseDto autoSalon;
 
-    private AddressDto address;
+    private AddressResponseDto address;
 
     @NotBlank(message = "Position cannot be blank")
     @Size(max = 50, message = "Position must not exceed 50 characters")

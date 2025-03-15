@@ -3,8 +3,10 @@ package org.example.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.aop.Loggable;
-import org.example.dto.ContactDto;
+import org.example.dto.request.ContactRequestDto;
+import org.example.dto.response.ContactResponseDto;
 import org.example.service.ContactService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,32 +21,35 @@ public class ContactController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public List<ContactDto> getAllContacts() {
-        return contactService.getAllContacts();
+    public ResponseEntity<List<ContactResponseDto>> getAllContacts() {
+        return ResponseEntity.ok(contactService.getAllContacts());
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public ContactDto getContactById(@PathVariable int id) {
-        return contactService.getContactById(id);
+    public ResponseEntity<ContactResponseDto> getContactById(@PathVariable int id) {
+        return ResponseEntity.ok(contactService.getContactById(id));
     }
 
     @Loggable
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public void addContact(@Valid @RequestBody ContactDto contactDto) {
+    public ResponseEntity<String> addContact(@Valid @RequestBody ContactRequestDto contactDto) {
         contactService.addContact(contactDto);
+        return ResponseEntity.ok("Contact added successfully");
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public void updateContact(@Valid @RequestBody ContactDto contactDto) {
-        contactService.updateContact(contactDto);
+    public ResponseEntity<String> updateContact(@PathVariable int id, @Valid @RequestBody ContactRequestDto contactDto) {
+        contactService.updateContact(id, contactDto);
+        return ResponseEntity.ok("Contact updated successfully");
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public void deleteContact(@PathVariable("id") int id) {
+    public ResponseEntity<String> deleteContact(@PathVariable("id") int id) {
         contactService.deleteContactById(id);
+        return ResponseEntity.ok("Contact deleted successfully");
     }
 }

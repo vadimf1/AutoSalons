@@ -1,4 +1,4 @@
-package org.example.dto;
+package org.example.dto.request;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
@@ -16,8 +16,10 @@ import java.util.List;
 
 @Data
 @Builder
-public class AddCarDto {
-    private Integer id;
+public class UpdateCarDto {
+
+//    @NotNull(message = "ID cannot be null")
+//    private Integer id;
 
     @NotBlank(message = "Марка не должна быть пустой")
     @Size(max = 50, message = "Максимальная длина марки — 50 символов")
@@ -61,7 +63,8 @@ public class AddCarDto {
     private String status;
 
     @NotNull(message = "Автосалон не может быть пустым")
-    private List<AutoSalonDto> autoSalons;
+    @Size(min = 1, message = "Список автосалонов не может быть пустым")
+    private List<Integer> autoSalonIds;
 
     @NotNull(message = "Dealer id cannot be null")
     private Integer dealerId;

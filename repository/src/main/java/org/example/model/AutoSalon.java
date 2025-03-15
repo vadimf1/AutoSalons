@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @SuperBuilder
@@ -48,4 +49,11 @@ public class AutoSalon extends BaseEntity {
 
     @OneToMany(mappedBy = "autoSalon")
     private Set<Sale> sales;
+
+    public void addContact(Contact contact) {
+        if (contacts == null) {
+            contacts = new HashSet<>();
+        }
+        contacts.add(contact);
+    }
 }

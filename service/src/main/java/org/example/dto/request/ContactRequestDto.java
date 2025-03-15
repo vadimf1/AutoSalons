@@ -1,15 +1,9 @@
-package org.example.dto;
+package org.example.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
-import lombok.Data;
 
-@Data
-@Builder
-public class ContactDto {
-
-    private Integer id;
+public class ContactRequestDto {
 
     @NotBlank(message = "Тип контакта не может быть пустым")
     private String contactType;

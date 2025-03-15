@@ -3,8 +3,10 @@ package org.example.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.aop.Loggable;
-import org.example.dto.AddressDto;
+import org.example.dto.request.AddressRequestDto;
+import org.example.dto.response.AddressResponseDto;
 import org.example.service.AddressService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,33 +21,36 @@ public class AddressController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public List<AddressDto> getAllAddresses() {
-        return addressService.getAllAddresses();
+    public ResponseEntity<List<AddressResponseDto>> getAllAddresses() {
+        return ResponseEntity.ok(addressService.getAllAddresses());
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public AddressDto getAddressById(@PathVariable int id) {
-        return addressService.getAddressById(id);
+    public ResponseEntity<AddressResponseDto> getAddressById(@PathVariable int id) {
+        return ResponseEntity.ok(addressService.getAddressById(id));
     }
 
     @Loggable
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public void addAddress(@Valid @RequestBody AddressDto addressDto) {
+    public ResponseEntity<String> addAddress(@Valid @RequestBody AddressRequestDto addressDto) {
         addressService.addAddress(addressDto);
+        return ResponseEntity.ok("Address added successfully");
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public void updateAddress(@Valid @RequestBody AddressDto addressDto) {
-        addressService.updateAddress(addressDto);
+    public ResponseEntity<String> updateAddress(@PathVariable int id, @Valid @RequestBody AddressRequestDto addressDto) {
+        addressService.updateAddress(id, addressDto);
+        return ResponseEntity.ok("Address updated successfully");
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public void deleteAddress(@PathVariable("id") int id) {
+    public ResponseEntity<String> deleteAddress(@PathVariable("id") int id) {
         addressService.deleteAddressById(id);
+        return ResponseEntity.ok("Address deleted successfully");
     }
 }
 

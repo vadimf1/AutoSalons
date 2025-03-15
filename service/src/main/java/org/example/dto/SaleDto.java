@@ -10,6 +10,9 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
+import org.example.dto.response.AutoSalonResponseDto;
+import org.example.dto.response.CarResponseDto;
+import org.example.dto.response.ClientResponseDto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -21,13 +24,13 @@ public class SaleDto {
     private Integer id;
 
     @NotNull(message = "Auto salon cannot be null")
-    private AutoSalonDto autoSalon;
+    private AutoSalonResponseDto autoSalon;
 
     @NotNull(message = "Client cannot be null")
-    private ClientDto client;
+    private ClientResponseDto client;
 
     @NotNull(message = "Car cannot be null")
-    private CarDto car;
+    private CarResponseDto car;
 
     @NotNull(message = "Employee cannot be null")
     private EmployeeDto employee;

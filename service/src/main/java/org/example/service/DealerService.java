@@ -1,14 +1,14 @@
 package org.example.service;
 
-import org.example.dto.DealerDto;
+import org.example.dto.response.DealerResponseDto;
 
 import java.util.List;
 
 public interface DealerService {
-    List<DealerDto> getAllDealers();
-    void addDealer(DealerDto dealerDto);
-    DealerDto getDealerById(int id);
-    void updateDealer(DealerDto dealerDto);
+    List<DealerResponseDto> getAllDealers();
+    void addDealer(DealerResponseDto dealerDto);
+    DealerResponseDto getDealerById(int id);
+    void updateDealer(DealerResponseDto dealerDto);
     void deleteDealerById(int id);
-    DealerDto getDealerByName(String name);
+    DealerResponseDto getDealerByName(String name);
 }

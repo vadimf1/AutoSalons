@@ -2,7 +2,7 @@ package org.example.service.impl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.example.dto.DealerDto;
+import org.example.dto.response.DealerResponseDto;
 import org.example.exception.ServiceException;
 import org.example.mapper.DealerMapper;
 import org.example.repository.DealerRepository;
@@ -19,14 +19,14 @@ public class DealerServiceImpl implements DealerService {
     private final DealerRepository dealerRepository;
     private final DealerMapper dealerMapper;
 
-    public List<DealerDto> getAllDealers() {
+    public List<DealerResponseDto> getAllDealers() {
         return dealerRepository.findAll()
                 .stream()
                 .map(dealerMapper::toDto)
                 .toList();
     }
 
-    public void addDealer(DealerDto dealerDto) {
+    public void addDealer(DealerResponseDto dealerDto) {
         if (dealerDto.getId() != null) {
             throw new ServiceException(DealerExceptionCode.ID_FIELD_EXPECTED_NULL.getMessage());
         }
@@ -34,14 +34,14 @@ public class DealerServiceImpl implements DealerService {
         dealerRepository.save(dealerMapper.toEntity(dealerDto));
     }
 
-    public DealerDto getDealerById(int id) {
+    public DealerResponseDto getDealerById(int id) {
         return dealerRepository.findById(id)
                 .map(dealerMapper::toDto)
                 .orElseThrow(() -> new ServiceException(DealerExceptionCode.DEALER_NOT_FOUNT_BY_ID.getMessage() + id));
 
     }
 
-    public void updateDealer(DealerDto dealerDto) {
+    public void updateDealer(DealerResponseDto dealerDto) {
         getDealerById(dealerDto.getId());
         dealerRepository.save(dealerMapper.toEntity(dealerDto));
     }
@@ -50,7 +50,7 @@ public class DealerServiceImpl implements DealerService {
         dealerRepository.deleteById(id);
     }
 
-    public DealerDto getDealerByName(String name) {
+    public DealerResponseDto getDealerByName(String name) {
         return dealerRepository.findByName(name)
                 .map(dealerMapper::toDto)
                 .orElseThrow(() -> new ServiceException(DealerExceptionCode.DEALER_NOT_FOUND_BY_NAME.getMessage() + name));

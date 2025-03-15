@@ -4,10 +4,11 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.example.dto.response.AutoSalonResponseDto;
+import org.example.dto.response.CarResponseDto;
+import org.example.dto.response.ClientResponseDto;
 import org.example.model.Dealer;
 
 import java.time.LocalDate;
@@ -19,7 +20,7 @@ public class ReviewDto {
     private Integer id;
 
     @NotNull(message = "ID клиента обязательно")
-    private ClientDto client;
+    private ClientResponseDto client;
 
     @NotEmpty(message = "Описание не должно быть пустым")
     private String description;
@@ -33,7 +34,7 @@ public class ReviewDto {
 
     private Dealer dealer;
 
-    private AutoSalonDto autoSalon;
+    private AutoSalonResponseDto autoSalon;
 
-    private CarDto car;
+    private CarResponseDto car;
 }
