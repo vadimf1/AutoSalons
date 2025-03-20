@@ -27,8 +27,21 @@ public class DealerCarController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public ResponseEntity<DealerCarResponseDto> getDealerCarById(@PathVariable Integer id) {
+    public ResponseEntity<DealerCarResponseDto> getDealerCarById(@PathVariable int id) {
         return ResponseEntity.ok(dealerCarService.getDealerCarById(id));
+    }
+
+    @Loggable
+    @GetMapping("/car/{carId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<DealerCarResponseDto>> getDealersCarByCarId(@PathVariable int carId) {
+        return ResponseEntity.ok(dealerCarService.getDealersCarByCarId(carId));
+    }
+
+    @GetMapping("/dealer/{dealerId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<DealerCarResponseDto>> getDealersCarsByDealerId(@PathVariable int dealerId) {
+        return ResponseEntity.ok(dealerCarService.getDealersCarsByDealerId(dealerId));
     }
 
     @Loggable

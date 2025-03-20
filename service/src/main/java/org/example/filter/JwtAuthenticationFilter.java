@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.example.service.UserService;
+import org.example.service.impl.CustomUserDetailsService;
 import org.example.service.impl.JwtSecurityService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
@@ -24,7 +24,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtSecurityService jwtSecurityService;
-    private final UserService userService;
+    private final CustomUserDetailsService userService;
 
     @Override
     protected void doFilterInternal(

@@ -2,6 +2,7 @@ package org.example.service.impl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.example.dto.request.AutoSalonFilterRequest;
 import org.example.dto.request.AutoSalonRequestDto;
 import org.example.dto.response.AutoSalonResponseDto;
 import org.example.exception.ServiceException;
@@ -12,6 +13,7 @@ import org.example.model.Contact;
 import org.example.repository.AddressRepository;
 import org.example.repository.AutoSalonRepository;
 import org.example.repository.ContactRepository;
+import org.example.repository.specification.AutoSalonSpecification;
 import org.example.service.AutoSalonService;
 import org.example.util.error.AddressExceptionCode;
 import org.example.util.error.AutoSalonExceptionCode;
@@ -82,5 +84,16 @@ public class AutoSalonServiceImpl implements AutoSalonService {
 
     public void deleteAutoSalonById(int id) {
         autoSalonRepository.deleteById(id);
+    }
+
+    @Override
+    public List<AutoSalonResponseDto> getFilteredAutoSalons(AutoSalonFilterRequest autoSalonFilterRequest) {
+        return autoSalonRepository.findAll(AutoSalonSpecification.filter(
+                        autoSalonFilterRequest.getCity(),
+                        autoSalonFilterRequest.getName()
+                ))
+                .stream()
+                .map(autoSalonMapper::toDto)
+                .toList();
     }
 }

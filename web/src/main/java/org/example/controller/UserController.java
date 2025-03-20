@@ -3,6 +3,7 @@ package org.example.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.aop.Loggable;
+import org.example.dto.request.UserProfileUpdateDto;
 import org.example.dto.request.UserRequestDto;
 import org.example.dto.response.UserResponseDto;
 import org.example.service.UserService;
@@ -48,9 +49,16 @@ public class UserController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public ResponseEntity<String> updateUser(@PathVariable int id, @Valid @RequestBody UserRequestDto updatedUserDto) {
-        userService.updateUser(id, updatedUserDto);
+    public ResponseEntity<String> updateUser(@PathVariable int id, @Valid @RequestBody UserRequestDto userDto) {
+        userService.updateUser(id, userDto);
         return ResponseEntity.ok("User updated successfully");
+    }
+
+    @PutMapping("/{id}/profile")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<String> updateUserProfile(@PathVariable int id, @Valid @RequestBody UserProfileUpdateDto userProfileDto) {
+        userService.updateUserProfile(id, userProfileDto);
+        return ResponseEntity.ok("User profile updated successfully");
     }
 
     @DeleteMapping("/{id}")

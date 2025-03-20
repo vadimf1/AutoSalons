@@ -73,4 +73,24 @@ public class DealerCarServiceImpl implements DealerCarService {
     public void deleteDealerCarById(Integer id) {
         dealerCarRepository.deleteById(id);
     }
+
+    public List<DealerCarResponseDto> getDealersCarByCarId(int carId) {
+        return dealerCarRepository.findByCar(
+                    carRepository.findById(carId)
+                            .orElseThrow(() -> new ServiceException(CarExceptionCode.ID_FIELD_NOT_NULL.getMessage() + carId))
+                )
+                .stream()
+                .map(dealerCarMapper::toDto)
+                .toList();
+    }
+
+    public List<DealerCarResponseDto> getDealersCarsByDealerId(int dealerId) {
+        return dealerCarRepository.findByDealer(
+                        dealerRepository.findById(dealerId)
+                                .orElseThrow(() -> new ServiceException(DealerExceptionCode.DEALER_NOT_FOUNT_BY_ID.getMessage() + dealerId))
+                )
+                .stream()
+                .map(dealerCarMapper::toDto)
+                .toList();
+    }
 }

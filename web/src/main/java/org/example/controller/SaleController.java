@@ -31,6 +31,12 @@ public class SaleController {
         return ResponseEntity.ok(saleService.getSaleById(id));
     }
 
+    @GetMapping("/client/{clientId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<SaleResponseDto>> getSaleByClientId(@PathVariable int clientId) {
+        return ResponseEntity.ok(saleService.getSaleByClientId(clientId));
+    }
+
     @Loggable
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")

@@ -2,6 +2,7 @@ package org.example.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.example.dto.request.ReviewFilterRequest;
 import org.example.dto.request.ReviewRequestDto;
 import org.example.dto.response.ReviewResponseDto;
 import org.example.service.ReviewService;
@@ -33,28 +34,40 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.getAllReviews());
     }
 
-    @GetMapping("/client-id/{clientId}")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<ReviewResponseDto>> getReviewByClientId(@PathVariable int clientId) {
-        return ResponseEntity.ok(reviewService.getReviewByClientId(clientId));
-    }
-
-    @GetMapping("/created-at/{createdAt}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public ResponseEntity<List<ReviewResponseDto>> getReviewsByDate(@PathVariable LocalDate createdAt) {
-        return ResponseEntity.ok(reviewService.getReviewsByDate(createdAt));
-    }
-
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ReviewResponseDto> getReviewById(@PathVariable("id") int id) {
         return ResponseEntity.ok(reviewService.getReviewById(id));
     }
 
-    @GetMapping("/rating/{rating}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public ResponseEntity<List<ReviewResponseDto>> getReviewsByRating(@PathVariable int rating) {
-        return ResponseEntity.ok(reviewService.getReviewsByRating(rating));
+    @GetMapping("/client/{clientId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<ReviewResponseDto>> getReviewByClientId(@PathVariable int clientId) {
+        return ResponseEntity.ok(reviewService.getReviewByClientId(clientId));
+    }
+
+    @GetMapping("/car/{carId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<ReviewResponseDto>> getReviewByCarId(@PathVariable int carId) {
+        return ResponseEntity.ok(reviewService.getReviewByCarId(carId));
+    }
+
+    @GetMapping("/auto-salon/{autoSalonId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<ReviewResponseDto>> getReviewByAutoSalonId(@PathVariable int autoSalonId) {
+        return ResponseEntity.ok(reviewService.getReviewByAutoSalonId(autoSalonId));
+    }
+
+    @GetMapping("/dealer/{dealerId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<ReviewResponseDto>> getReviewByDealerId(@PathVariable int dealerId) {
+        return ResponseEntity.ok(reviewService.getReviewByDealerId(dealerId));
+    }
+
+    @PostMapping("/filter")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<ReviewResponseDto>> getFilteredReviews(@RequestBody ReviewFilterRequest reviewFilterRequest) {
+        return ResponseEntity.ok(reviewService.getFilteredReviews(reviewFilterRequest));
     }
 
     @PostMapping

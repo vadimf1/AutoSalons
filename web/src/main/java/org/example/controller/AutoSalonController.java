@@ -3,6 +3,7 @@ package org.example.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.aop.Loggable;
+import org.example.dto.request.AutoSalonFilterRequest;
 import org.example.dto.request.AutoSalonRequestDto;
 import org.example.dto.response.AutoSalonResponseDto;
 import org.example.service.AutoSalonService;
@@ -29,6 +30,12 @@ public class AutoSalonController {
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public ResponseEntity<AutoSalonResponseDto> getAutoSalonById(@PathVariable int id) {
         return ResponseEntity.ok(autoSalonService.getAutoSalonById(id));
+    }
+
+    @PostMapping("/filter")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<AutoSalonResponseDto>> getFilteredAutoSalons(@RequestBody AutoSalonFilterRequest autoSalonFilterRequest) {
+        return ResponseEntity.ok(autoSalonService.getFilteredAutoSalons(autoSalonFilterRequest));
     }
 
     @Loggable

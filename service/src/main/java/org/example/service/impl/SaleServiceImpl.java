@@ -89,4 +89,14 @@ public class SaleServiceImpl implements SaleService {
     public void deleteSaleById(int id) {
         saleRepository.deleteById(id);
     }
+
+    public List<SaleResponseDto> getSaleByClientId(int clientId) {
+        return saleRepository.findByClient(
+                        clientRepository.findById(clientId)
+                                .orElseThrow(() -> new ServiceException(ClientExceptionCode.CLIENT_NOT_FOUND_BY_ID.getMessage() + clientId))
+                )
+                .stream()
+                .map(saleMapper::toDto)
+                .toList();
+    }
 }

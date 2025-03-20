@@ -6,7 +6,7 @@ import org.example.aop.Loggable;
 import org.example.dto.request.UpdateCarDto;
 import org.example.dto.response.CarResponseDto;
 import org.example.dto.request.AddCarDto;
-import org.example.dto.request.CarRequest;
+import org.example.dto.request.CarFilterRequest;
 import org.example.service.CarService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -41,10 +41,10 @@ public class CarController {
         return ResponseEntity.ok(carService.getCarById(id));
     }
 
-    @PostMapping("/search")
+    @PostMapping("/filter")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<CarResponseDto>> searchCar(@RequestBody CarRequest carRequest) {
-        return ResponseEntity.ok(carService.searchCars(carRequest));
+    public ResponseEntity<List<CarResponseDto>> getFilteredCars(@RequestBody CarFilterRequest carFilterRequest) {
+        return ResponseEntity.ok(carService.getFilteredCars(carFilterRequest));
     }
 
     @Loggable

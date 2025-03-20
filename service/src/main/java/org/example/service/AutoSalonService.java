@@ -1,5 +1,6 @@
 package org.example.service;
 
+import org.example.dto.request.AutoSalonFilterRequest;
 import org.example.dto.request.AutoSalonRequestDto;
 import org.example.dto.response.AutoSalonResponseDto;
 
@@ -11,4 +12,5 @@ public interface AutoSalonService {
     AutoSalonResponseDto getAutoSalonById(int id);
     void updateAutoSalon(int id, AutoSalonRequestDto autoSalonDto);
     void deleteAutoSalonById(int id);
+    List<AutoSalonResponseDto> getFilteredAutoSalons(AutoSalonFilterRequest autoSalonFilterRequest);
 }

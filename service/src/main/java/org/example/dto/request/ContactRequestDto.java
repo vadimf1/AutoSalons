@@ -2,7 +2,11 @@ package org.example.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
+import lombok.Data;
 
+@Builder
+@Data
 public class ContactRequestDto {
 
     @NotBlank(message = "Тип контакта не может быть пустым")

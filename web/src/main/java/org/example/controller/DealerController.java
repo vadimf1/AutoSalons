@@ -3,6 +3,7 @@ package org.example.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.aop.Loggable;
+import org.example.dto.request.DealerFilterRequest;
 import org.example.dto.request.DealerRequestDto;
 import org.example.dto.response.DealerResponseDto;
 import org.example.service.DealerService;
@@ -31,10 +32,10 @@ public class DealerController {
         return ResponseEntity.ok(dealerService.getDealerById(id));
     }
 
-    @GetMapping("/name/{name}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public ResponseEntity<DealerResponseDto> getDealerByName(@PathVariable String name) {
-        return ResponseEntity.ok(dealerService.getDealerByName(name));
+    @PostMapping("/filter")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<DealerResponseDto>> getFilteredDealers(@RequestBody DealerFilterRequest dealerFilterRequest) {
+        return ResponseEntity.ok(dealerService.getFilteredDealers(dealerFilterRequest));
     }
 
     @Loggable

@@ -3,7 +3,7 @@ package org.example.dto.request;
 import lombok.Data;
 
 @Data
-public class CarRequest {
+public class CarFilterRequest {
     private String vin;
     private String make;
     private String model;

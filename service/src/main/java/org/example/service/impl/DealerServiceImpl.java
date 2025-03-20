@@ -2,6 +2,7 @@ package org.example.service.impl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.example.dto.request.DealerFilterRequest;
 import org.example.dto.request.DealerRequestDto;
 import org.example.dto.response.DealerResponseDto;
 import org.example.exception.ServiceException;
@@ -10,11 +11,13 @@ import org.example.model.Dealer;
 import org.example.repository.AddressRepository;
 import org.example.repository.ContactRepository;
 import org.example.repository.DealerRepository;
+import org.example.repository.specification.DealerSpecification;
 import org.example.service.DealerService;
 import org.example.util.error.ContactExceptionCode;
 import org.example.util.error.DealerExceptionCode;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -46,6 +49,8 @@ public class DealerServiceImpl implements DealerService {
                 addressRepository.findById(addressId)
                         .orElseThrow(() -> new ServiceException(DealerExceptionCode.DEALER_NOT_FOUNT_BY_ID.getMessage() + addressId))
         );
+
+        dealer.setContacts(new HashSet<>());
 
         for (Integer contactId : contactIds) {
             if (contactId == null) {
@@ -80,9 +85,14 @@ public class DealerServiceImpl implements DealerService {
         dealerRepository.deleteById(id);
     }
 
-    public DealerResponseDto getDealerByName(String name) {
-        return dealerRepository.findByName(name)
+    @Override
+    public List<DealerResponseDto> getFilteredDealers(DealerFilterRequest dealerFilterRequest) {
+        return dealerRepository.findAll(DealerSpecification.filter(
+                        dealerFilterRequest.getCity(),
+                        dealerFilterRequest.getName()
+                ))
+                .stream()
                 .map(dealerMapper::toDto)
-                .orElseThrow(() -> new ServiceException(DealerExceptionCode.DEALER_NOT_FOUND_BY_NAME.getMessage() + name));
+                .toList();
     }
 }

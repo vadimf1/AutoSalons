@@ -32,7 +32,7 @@ public class TestDriveController {
         return ResponseEntity.ok(testDriveService.getAllTestDrives());
     }
 
-    @GetMapping("/client-id/{clientId}")
+    @GetMapping("/client/{clientId}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<TestDriveResponseDto>> getTestDrivesByClient(@PathVariable int clientId) {
         return ResponseEntity.ok(testDriveService.getTestDrivesByClientId(clientId));

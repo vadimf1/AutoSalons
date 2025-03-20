@@ -11,6 +11,7 @@ public class TestDriveResponseDto {
     private Integer id;
     private AutoSalonResponseDto autoSalon;
     private ClientResponseDto client;
+    private CarResponseDto car;
     private LocalDate testDriveDate;
     private String status;
 }

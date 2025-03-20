@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class UserRequestDto {
+public class UserProfileUpdateDto {
 
     @NotBlank(message = "Имя пользователя не может быть пустым")
     @Size(min = 8, max = 255, message = "Имя пользователя должно быть не менее 8 символов")
@@ -16,7 +16,4 @@ public class UserRequestDto {
     @NotBlank(message = "Пароль не может быть пустым")
     @Size(min = 8, message = "Пароль должен содержать не менее 8 символов")
     private String password;
-
-    @NotBlank(message = "Роль не может быть пустой")
-    private String role;
 }

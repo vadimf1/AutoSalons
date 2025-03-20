@@ -23,11 +23,11 @@ import java.math.BigDecimal;
 public class DealerCar extends BaseEntity {
 
     @ManyToOne
-    @JoinColumn(name = "dealer_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "dealer_id", nullable = false)
     private Dealer dealer;
 
     @ManyToOne
-    @JoinColumn(name = "car_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "car_id", nullable = false)
     private Car car;
 
     @Column(name = "price", nullable = false)

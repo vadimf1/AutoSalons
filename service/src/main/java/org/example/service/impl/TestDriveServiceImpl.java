@@ -71,7 +71,10 @@ public class TestDriveServiceImpl implements TestDriveService {
 
     @Transactional
     public List<TestDriveResponseDto> getTestDrivesByClientId(int clientId) {
-        return testDriveRepository.findByClient_Id(clientId)
+        return testDriveRepository.findByClient(
+                    clientRepository.findById(clientId)
+                            .orElseThrow(() -> new ServiceException(ClientExceptionCode.CLIENT_NOT_FOUND_BY_ID.getMessage() + clientId))
+                )
                 .stream()
                 .map(testDriveMapper::toDto)
                 .toList();

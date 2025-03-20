@@ -2,14 +2,7 @@ package org.example.repository;
 
 import org.example.model.AutoSalon;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-import java.util.List;
-import java.util.Optional;
-
-public interface AutoSalonRepository extends JpaRepository<AutoSalon, Integer> {
-    Optional<AutoSalon> findByAddressId(int addressId);
-
-    Optional<AutoSalon> findByName(String name);
-
-    List<AutoSalon> findByNameContaining(String name);
+public interface AutoSalonRepository extends JpaRepository<AutoSalon, Integer>, JpaSpecificationExecutor<AutoSalon> {
 }

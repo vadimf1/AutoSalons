@@ -2,6 +2,7 @@ package org.example.service.impl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.example.dto.request.UserProfileUpdateDto;
 import org.example.dto.request.UserRequestDto;
 import org.example.model.User;
 import org.example.repository.UserRepository;
@@ -10,22 +11,30 @@ import org.example.exception.ServiceException;
 import org.example.mapper.UserMapper;
 import org.example.service.UserService;
 import org.example.util.error.UserExceptionCode;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService, UserDetailsService {
+public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public void addUser(UserRequestDto userDto) {
-        userRepository.save(userMapper.toEntity(userDto));
+        if (userRepository.existsByUsername(userDto.getUsername())) {
+            throw new ServiceException(UserExceptionCode.USER_ALREADY_EXISTS.getMessage());
+        }
+
+        User user = userMapper.toEntity(userDto);
+
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+
+        userRepository.save(user);
     }
 
     @Transactional
@@ -49,7 +58,27 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         User user = userRepository.findById(id)
                         .orElseThrow(() -> new ServiceException(UserExceptionCode.USER_NOT_FOUND_BY_ID.getMessage() + id));
 
+        if (!Objects.equals(user.getUsername(), userDto.getUsername()) && userRepository.existsByUsername(userDto.getUsername())) {
+            throw new ServiceException(UserExceptionCode.USER_ALREADY_EXISTS.getMessage());
+        }
+
         userMapper.updateEntityFromDto(userDto, user);
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void updateUserProfile(int id, UserProfileUpdateDto userProfileDto) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ServiceException(UserExceptionCode.USER_NOT_FOUND_BY_ID.getMessage() + id));
+
+        if (!Objects.equals(user.getUsername(), userProfileDto.getUsername()) && userRepository.existsByUsername(userProfileDto.getUsername())) {
+            throw new ServiceException(UserExceptionCode.USER_ALREADY_EXISTS.getMessage());
+        }
+
+        user.setUsername(userProfileDto.getUsername());
+        user.setPassword(passwordEncoder.encode(userProfileDto.getPassword()));
 
         userRepository.save(user);
     }
@@ -57,11 +86,5 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Transactional
     public void deleteUserById(int userId) {
         userRepository.deleteById(userId);
-    }
-
-    @Transactional
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException(UserExceptionCode.USER_NOT_FOUND_BY_USERNAME.getMessage() + username));
     }
 }

@@ -12,7 +12,7 @@ import org.example.repository.CarRepository;
 import org.example.repository.DealerCarRepository;
 import org.example.repository.DealerRepository;
 import org.example.repository.specification.CarSpecification;
-import org.example.dto.request.CarRequest;
+import org.example.dto.request.CarFilterRequest;
 import org.example.exception.ServiceException;
 import org.example.mapper.CarMapper;
 import org.example.model.AutoSalon;
@@ -84,12 +84,12 @@ public class CarServiceImpl implements CarService {
     }
 
     @Transactional
-    public List<CarResponseDto> searchCars(CarRequest carRequest) {
+    public List<CarResponseDto> getFilteredCars(CarFilterRequest carFilterRequest) {
         return carRepository.findAll(CarSpecification.filterBy(
-                        carRequest.getVin(),
-                        carRequest.getMake(),
-                        carRequest.getModel(),
-                        carRequest.getYear()
+                        carFilterRequest.getVin(),
+                        carFilterRequest.getMake(),
+                        carFilterRequest.getModel(),
+                        carFilterRequest.getYear()
                 ))
                 .stream()
                 .map(carMapper::toDto)

@@ -5,30 +5,30 @@ import lombok.experimental.UtilityClass;
 import org.example.model.Car;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @UtilityClass
 public class CarSpecification {
 
     public Specification<Car> filterBy(String vin, String make, String model, Integer year) {
         return (root, query, cb) -> {
-            Predicate predicate = cb.conjunction();
+            List<Predicate> predicates = new ArrayList<>();
 
             if (vin != null) {
-                predicate = cb.and(predicate, cb.equal(root.get("vin"), vin));
+                predicates.add(cb.equal(root.get("vin"), vin));
             }
-
             if (make != null) {
-                predicate = cb.and(predicate, cb.equal(root.get("make"), make));
+                predicates.add(cb.equal(root.get("make"), make));
             }
-
             if (model != null) {
-                predicate = cb.and(predicate, cb.equal(root.get("model"), model));
+                predicates.add(cb.equal(root.get("model"), model));
             }
-
             if (year != null) {
-                predicate = cb.and(predicate, cb.equal(root.get("year"), year));
+                predicates.add(cb.equal(root.get("year"), year));
             }
 
-            return predicate;
+            return cb.and(predicates.toArray(new Predicate[0]));
         };
     }
 }

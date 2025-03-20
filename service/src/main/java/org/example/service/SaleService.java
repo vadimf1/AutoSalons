@@ -11,4 +11,5 @@ public interface SaleService {
     SaleResponseDto getSaleById(int id);
     void updateSale(int id, SaleRequestDto saleDto);
     void deleteSaleById(int id);
+    List<SaleResponseDto> getSaleByClientId(int clientId);
 }

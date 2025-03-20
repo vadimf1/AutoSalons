@@ -1,5 +1,6 @@
 package org.example.service;
 
+import org.example.dto.request.DealerFilterRequest;
 import org.example.dto.request.DealerRequestDto;
 import org.example.dto.response.DealerResponseDto;
 
@@ -11,5 +12,5 @@ public interface DealerService {
     DealerResponseDto getDealerById(int id);
     void updateDealer(int id, DealerRequestDto dealerDto);
     void deleteDealerById(int id);
-    DealerResponseDto getDealerByName(String name);
+    List<DealerResponseDto> getFilteredDealers(DealerFilterRequest dealerFilterRequest);
 }

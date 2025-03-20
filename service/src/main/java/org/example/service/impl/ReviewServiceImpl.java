@@ -2,6 +2,7 @@ package org.example.service.impl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.example.dto.request.ReviewFilterRequest;
 import org.example.dto.request.ReviewRequestDto;
 import org.example.repository.AutoSalonRepository;
 import org.example.repository.CarRepository;
@@ -12,6 +13,7 @@ import org.example.dto.response.ReviewResponseDto;
 import org.example.exception.ServiceException;
 import org.example.mapper.ReviewMapper;
 import org.example.model.Review;
+import org.example.repository.specification.ReviewSpecification;
 import org.example.service.ReviewService;
 import org.example.util.error.AutoSalonExceptionCode;
 import org.example.util.error.CarExceptionCode;
@@ -20,12 +22,12 @@ import org.example.util.error.DealerExceptionCode;
 import org.example.util.error.ReviewExceptionCode;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
@@ -35,7 +37,6 @@ public class ReviewServiceImpl implements ReviewService {
     private final ClientRepository clientRepository;
     private final ReviewMapper reviewMapper;
 
-    @Transactional
     public List<ReviewResponseDto> getAllReviews() {
         return reviewRepository.findAll()
                 .stream()
@@ -43,7 +44,6 @@ public class ReviewServiceImpl implements ReviewService {
                 .toList();
     }
 
-    @Transactional
     public ReviewResponseDto getReviewById(int reviewId) {
         return reviewRepository.findById(reviewId)
                 .map(reviewMapper::toDto)
@@ -51,31 +51,56 @@ public class ReviewServiceImpl implements ReviewService {
                         ReviewExceptionCode.REVIEW_NOT_FOUND_BY_ID.getMessage() + reviewId));
     }
 
-    @Transactional
-    public List<ReviewResponseDto> getReviewsByRating(int rating) {
-        return reviewRepository.findByRating(rating)
-                .stream()
-                .map(reviewMapper::toDto)
-                .toList();
-    }
-
-    @Transactional
-    public List<ReviewResponseDto> getReviewsByDate(LocalDate date) {
-        return reviewRepository.findByCreatedAt(date)
-                .stream()
-                .map(reviewMapper::toDto)
-                .toList();
-    }
-
-    @Transactional
     public List<ReviewResponseDto> getReviewByClientId(int clientId) {
-        return reviewRepository.findByClient_Id(clientId)
+        return reviewRepository.findByClient(
+                    clientRepository.findById(clientId)
+                            .orElseThrow(() -> new ServiceException(ClientExceptionCode.CLIENT_NOT_FOUND_BY_ID.getMessage() + clientId))
+                )
                 .stream()
                 .map(reviewMapper::toDto)
                 .toList();
     }
 
-    @Transactional
+    public List<ReviewResponseDto> getReviewByCarId(int carId) {
+        return reviewRepository.findByCar(
+                        carRepository.findById(carId)
+                                .orElseThrow(() -> new ServiceException(CarExceptionCode.CAR_NOT_FOUNT_BY_ID.getMessage() + carId))
+                )
+                .stream()
+                .map(reviewMapper::toDto)
+                .toList();
+    }
+
+    public List<ReviewResponseDto> getReviewByAutoSalonId(int autoSalonId) {
+        return reviewRepository.findByAutoSalon(
+                        autoSalonRepository.findById(autoSalonId)
+                                .orElseThrow(() -> new ServiceException(AutoSalonExceptionCode.AUTO_SALON_NOT_FOUNT_BY_ID.getMessage() + autoSalonId))
+                )
+                .stream()
+                .map(reviewMapper::toDto)
+                .toList();
+    }
+
+    public List<ReviewResponseDto> getReviewByDealerId(int dealerId) {
+        return reviewRepository.findByDealer(
+                        dealerRepository.findById(dealerId)
+                                .orElseThrow(() -> new ServiceException(DealerExceptionCode.DEALER_NOT_FOUNT_BY_ID.getMessage() + dealerId))
+                )
+                .stream()
+                .map(reviewMapper::toDto)
+                .toList();
+    }
+
+    public List<ReviewResponseDto> getFilteredReviews(ReviewFilterRequest reviewFilterRequest) {
+        return reviewRepository.findAll(ReviewSpecification.filter(
+                        reviewFilterRequest.getRating(),
+                        reviewFilterRequest.getCreatedAt()
+                ))
+                .stream()
+                .map(reviewMapper::toDto)
+                .toList();
+    }
+    
     public void addReview(ReviewRequestDto reviewDto) {
 
         Review review = reviewMapper.toEntity(reviewDto);
@@ -99,6 +124,10 @@ public class ReviewServiceImpl implements ReviewService {
                         .orElseThrow(() -> new ServiceException(ClientExceptionCode.CLIENT_NOT_FOUND_BY_ID.getMessage() + reviewDto.getClientId()))
         );
 
+        review.setAutoSalon(null);
+        review.setDealer(null);
+        review.setCar(null);
+
         if (reviewDto.getAutoSalonId() != null) {
             review.setAutoSalon(autoSalonRepository.findById(reviewDto.getAutoSalonId())
                     .orElseThrow(() -> new ServiceException(
@@ -114,7 +143,6 @@ public class ReviewServiceImpl implements ReviewService {
         }
     }
 
-    @Transactional
     public void updateReview(int id, ReviewRequestDto reviewDto) {
         Review review = reviewRepository.findById(id)
                         .orElseThrow(() -> new ServiceException(ReviewExceptionCode.REVIEW_NOT_FOUND_BY_ID.getMessage() + id));
@@ -125,7 +153,6 @@ public class ReviewServiceImpl implements ReviewService {
         reviewRepository.save(review);
     }
 
-    @Transactional
     public void deleteReviewById(int reviewId) {
         reviewRepository.deleteById(reviewId);
     }
