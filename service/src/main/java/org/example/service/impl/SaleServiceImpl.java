@@ -86,10 +86,6 @@ public class SaleServiceImpl implements SaleService {
         saleRepository.save(sale);
     }
 
-    public void deleteSaleById(int id) {
-        saleRepository.deleteById(id);
-    }
-
     public List<SaleResponseDto> getSaleByClientId(int clientId) {
         return saleRepository.findByClient(
                         clientRepository.findById(clientId)
@@ -98,5 +94,12 @@ public class SaleServiceImpl implements SaleService {
                 .stream()
                 .map(saleMapper::toDto)
                 .toList();
+    }
+
+    public void deleteSaleById(int id) {
+        saleRepository.findById(id)
+                        .orElseThrow(() -> new ServiceException(SaleExceptionCode.SALE_NOT_FOUND_BY_ID.getMessage() + id));
+
+        saleRepository.deleteById(id);
     }
 }

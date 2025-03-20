@@ -70,10 +70,6 @@ public class DealerCarServiceImpl implements DealerCarService {
         dealerCarRepository.save(dealerCar);
     }
 
-    public void deleteDealerCarById(Integer id) {
-        dealerCarRepository.deleteById(id);
-    }
-
     public List<DealerCarResponseDto> getDealersCarByCarId(int carId) {
         return dealerCarRepository.findByCar(
                     carRepository.findById(carId)
@@ -92,5 +88,12 @@ public class DealerCarServiceImpl implements DealerCarService {
                 .stream()
                 .map(dealerCarMapper::toDto)
                 .toList();
+    }
+
+    public void deleteDealerCarById(Integer id) {
+        dealerCarRepository.findById(id)
+                        .orElseThrow(() -> new ServiceException(DealerCarExceptionCode.DEALER_CAR_NOT_FOUND_BY_ID.getMessage() + id));
+
+        dealerCarRepository.deleteById(id);
     }
 }

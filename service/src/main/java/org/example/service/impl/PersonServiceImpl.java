@@ -67,6 +67,9 @@ public class PersonServiceImpl implements PersonService {
     }
 
     public void deletePersonById(int id) {
+        personRepository.findById(id)
+                        .orElseThrow(() -> new ServiceException(PersonExceptionCode.PERSON_NOT_FOUNT_BY_ID.getMessage() + id));
+
         personRepository.deleteById(id);
     }
 }

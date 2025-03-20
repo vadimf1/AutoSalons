@@ -48,6 +48,9 @@ public class ContactServiceImpl implements ContactService {
     }
 
     public void deleteContactById(int id) {
+        contactRepository.findById(id)
+                        .orElseThrow(() -> new ServiceException(ContactExceptionCode.CONTACT_NOT_FOUND_BY_ID.getMessage() + id));
+
         contactRepository.deleteById(id);
     }
 }

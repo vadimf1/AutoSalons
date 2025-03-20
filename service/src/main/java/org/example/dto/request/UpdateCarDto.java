@@ -18,9 +18,6 @@ import java.util.List;
 @Builder
 public class UpdateCarDto {
 
-//    @NotNull(message = "ID cannot be null")
-//    private Integer id;
-
     @NotBlank(message = "Марка не должна быть пустой")
     @Size(max = 50, message = "Максимальная длина марки — 50 символов")
     private String make;

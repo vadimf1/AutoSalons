@@ -103,6 +103,9 @@ public class ClientServiceImpl implements ClientService {
 
     @Transactional
     public void deleteClientById(int clientId) {
+        clientRepository.findById(clientId)
+                        .orElseThrow(() -> new ServiceException(ClientExceptionCode.CLIENT_NOT_FOUND_BY_ID.getMessage() + clientId));
+
         clientRepository.deleteById(clientId);
     }
 }

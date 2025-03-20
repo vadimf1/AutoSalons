@@ -154,6 +154,9 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     public void deleteReviewById(int reviewId) {
+        reviewRepository.findById(reviewId)
+                        .orElseThrow(() -> new ServiceException(ReviewExceptionCode.REVIEW_NOT_FOUND_BY_ID.getMessage() + reviewId));
+
         reviewRepository.deleteById(reviewId);
     }
 }

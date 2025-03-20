@@ -87,6 +87,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     public void deleteEmployeeById(int id) {
+        employeeRepository.findById(id)
+                        .orElseThrow(() -> new ServiceException(EmployeeExceptionCode.EMPLOYEE_NOT_FOUND_BY_ID.getMessage() + id));
         employeeRepository.deleteById(id);
     }
 }

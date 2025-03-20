@@ -81,10 +81,6 @@ public class DealerServiceImpl implements DealerService {
         dealerRepository.save(dealer);
     }
 
-    public void deleteDealerById(int id) {
-        dealerRepository.deleteById(id);
-    }
-
     @Override
     public List<DealerResponseDto> getFilteredDealers(DealerFilterRequest dealerFilterRequest) {
         return dealerRepository.findAll(DealerSpecification.filter(
@@ -94,5 +90,12 @@ public class DealerServiceImpl implements DealerService {
                 .stream()
                 .map(dealerMapper::toDto)
                 .toList();
+    }
+
+    public void deleteDealerById(int id) {
+        dealerRepository.findById(id)
+                        .orElseThrow(() -> new ServiceException(DealerExceptionCode.DEALER_NOT_FOUNT_BY_ID.getMessage() + id));
+
+        dealerRepository.deleteById(id);
     }
 }

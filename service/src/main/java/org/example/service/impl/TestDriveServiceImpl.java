@@ -100,7 +100,10 @@ public class TestDriveServiceImpl implements TestDriveService {
     }
 
     @Transactional
-    public void deleteTestDriveById(int testDriveId) {
-        testDriveRepository.deleteById(testDriveId);
+    public void deleteTestDriveById(int id) {
+        testDriveRepository.findById(id)
+                        .orElseThrow(() -> new ServiceException(TestDriveExceptionCode.TEST_DRIVE_NOT_FOUNT_BY_ID.getMessage() + id));
+
+        testDriveRepository.deleteById(id);
     }
 }

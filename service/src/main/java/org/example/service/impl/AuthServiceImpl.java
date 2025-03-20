@@ -67,14 +67,11 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow();
 
         if (jwtSecurityService.validateToken(jwt, user)) {
-            RefreshTokenResponseDto refreshTokenResponseDto = new RefreshTokenResponseDto();
-
-            refreshTokenResponseDto.setJwtToken(jwtSecurityService.generateToken(user));
-            refreshTokenResponseDto.setRefreshToken(jwtSecurityService.generateRefreshToken(new HashMap<>(), user));
-
-            return refreshTokenResponseDto;
+            return RefreshTokenResponseDto.builder()
+                    .jwtToken(jwtSecurityService.generateToken(user))
+                    .refreshToken(jwtSecurityService.generateRefreshToken(new HashMap<>(), user))
+                    .build();
         }
-
         return null;
     }
 }

@@ -73,10 +73,6 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ServiceException(UserExceptionCode.USER_NOT_FOUND_BY_ID.getMessage() + id));
 
-        if (!Objects.equals(user.getUsername(), userProfileDto.getUsername()) && userRepository.existsByUsername(userProfileDto.getUsername())) {
-            throw new ServiceException(UserExceptionCode.USER_ALREADY_EXISTS.getMessage());
-        }
-
         user.setUsername(userProfileDto.getUsername());
         user.setPassword(passwordEncoder.encode(userProfileDto.getPassword()));
 
@@ -84,7 +80,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    public void deleteUserById(int userId) {
-        userRepository.deleteById(userId);
+    public void deleteUserById(int id) {
+        userRepository.findById(id)
+                        .orElseThrow(() -> new ServiceException(UserExceptionCode.USER_NOT_FOUND_BY_ID.getMessage() + id));
+
+        userRepository.deleteById(id);
     }
 }
