@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+
+    <changeSet id="1" author="user">
+        <sql>
+            CREATE TYPE role_enum AS ENUM ('CLIENT', 'EMPLOYEE');
+            CREATE TYPE contact_type_enum AS ENUM ('PHONE', 'EMAIL', 'SOCIAL_MEDIA', 'FAX');
+        </sql>
+    </changeSet>
+
+    <changeSet id="2" author="user">
+        <sql>
+            CREATE TABLE addresses (
+                id SERIAL PRIMARY KEY,
+                country VARCHAR(50) NOT NULL,
+                city VARCHAR(100) NOT NULL,
+                state VARCHAR(50),
+                street VARCHAR(50) NOT NULL,
+                postal_code VARCHAR(10) NOT NULL
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="3" author="user">
+        <sql>
+            CREATE TABLE autosalons (
+                id SERIAL PRIMARY KEY,
+                address_id INT REFERENCES addresses(id) ON DELETE SET NULL,
+                name VARCHAR(100) NOT NULL UNIQUE
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="4" author="user">
+        <sql>
+            CREATE TABLE users (
+                id SERIAL PRIMARY KEY,
+                username VARCHAR(255) UNIQUE NOT NULL CHECK (LENGTH(username) > 8),
+                password VARCHAR(255) NOT NULL CHECK (LENGTH(password) > 8),
+                role role_enum NOT NULL,
+                created_at DATE NOT NULL DEFAULT CURRENT_DATE
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="5" author="user">
+        <sql>
+            CREATE TABLE persons (
+                id SERIAL PRIMARY KEY,
+                first_name VARCHAR(50) NOT NULL,
+                last_name VARCHAR(50) NOT NULL
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="6" author="user">
+        <sql>
+            CREATE TABLE employees (
+                id SERIAL PRIMARY KEY,
+                person_id INT NOT NULL REFERENCES persons(id) ON DELETE CASCADE,
+                user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                autosalon_id INT REFERENCES autosalons(id) ON DELETE SET NULL,
+                address_id INT REFERENCES addresses(id) ON DELETE SET NULL,
+                position VARCHAR(50) NOT NULL,
+                salary NUMERIC NOT NULL CHECK (salary > 0)
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="7" author="user">
+        <sql>
+            CREATE TABLE clients (
+                id SERIAL PRIMARY KEY,
+                person_id INT NOT NULL REFERENCES persons(id) ON DELETE CASCADE,
+                user_id INT REFERENCES users(id) ON DELETE SET NULL,
+                address_id INT NOT NULL REFERENCES addresses(id),
+                birth_date DATE NOT NULL CHECK (birth_date &lt;= CURRENT_DATE),
+                passport_number VARCHAR(20) NOT NULL UNIQUE
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="8" author="user">
+        <sql>
+            CREATE TABLE cars (
+                id SERIAL PRIMARY KEY,
+                make VARCHAR(50) NOT NULL,
+                model VARCHAR(50) NOT NULL,
+                vin VARCHAR(17) NOT NULL UNIQUE,
+                "year" INT NOT NULL CHECK ("year" > 1885),
+                color VARCHAR(30) NOT NULL,
+                body_type VARCHAR(30) NOT NULL,
+                engine_type VARCHAR(30) NOT NULL,
+                fuel_type VARCHAR(30) NOT NULL,
+                transmission VARCHAR(30) NOT NULL,
+                status VARCHAR(20) NOT NULL
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="9" author="user">
+        <sql>
+            CREATE TABLE dealers (
+                id SERIAL PRIMARY KEY,
+                address_id INT REFERENCES addresses(id) ON DELETE SET NULL,
+                name VARCHAR(100) NOT NULL UNIQUE
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="10" author="user">
+        <sql>
+            CREATE TABLE autosalons_cars (
+                autosalon_id INT NOT NULL REFERENCES autosalons(id) ON DELETE CASCADE,
+                car_id INT NOT NULL REFERENCES cars(id) ON DELETE CASCADE,
+                PRIMARY KEY (autosalon_id, car_id)
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="11" author="user">
+        <sql>
+            CREATE TABLE reviews (
+                id SERIAL PRIMARY KEY,
+                client_id INT NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+                description TEXT NOT NULL,
+                rating NUMERIC NOT NULL CHECK (rating >= 0 AND rating &lt;= 5),
+                created_at DATE NOT NULL DEFAULT CURRENT_DATE
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="12" author="user">
+        <sql>
+            CREATE TABLE dealers_reviews (
+                dealer_id INT NOT NULL REFERENCES dealers(id) ON DELETE CASCADE,
+                review_id INT NOT NULL REFERENCES reviews(id) ON DELETE CASCADE,
+                PRIMARY KEY (dealer_id, review_id)
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="13" author="user">
+        <sql>
+            CREATE TABLE autosalons_reviews (
+                autosalon_id INT NOT NULL REFERENCES autosalons(id) ON DELETE CASCADE,
+                review_id INT NOT NULL REFERENCES reviews(id) ON DELETE CASCADE,
+                PRIMARY KEY (autosalon_id, review_id)
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="14" author="user">
+        <sql>
+            CREATE TABLE sales (
+                id SERIAL PRIMARY KEY,
+                autosalon_id INT NOT NULL REFERENCES autosalons(id) ON DELETE CASCADE,
+                client_id INT NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+                car_id INT NOT NULL REFERENCES cars(id) ON DELETE CASCADE,
+                employee_id INT REFERENCES employees(id) ON DELETE SET NULL,
+                sale_date DATE NOT NULL,
+                discount NUMERIC DEFAULT 0 CHECK (discount >= 0 AND discount &lt;= 1),
+                final_price NUMERIC NOT NULL CHECK (final_price > 0),
+                payment_method VARCHAR(50) NOT NULL,
+                configuration VARCHAR(20),
+                warranty_period INT NOT NULL CHECK (warranty_period >= 0)
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="15" author="user">
+        <sql>
+            CREATE TABLE contacts (
+                id SERIAL PRIMARY KEY,
+                contact_type contact_type_enum NOT NULL,
+                contact_value VARCHAR(255) NOT NULL UNIQUE
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="16" author="user">
+        <sql>
+            CREATE TABLE test_drives (
+                id SERIAL PRIMARY KEY,
+                autosalon_id INT NOT NULL REFERENCES autosalons(id) ON DELETE CASCADE,
+                car_id INT NOT NULL REFERENCES cars(id) ON DELETE CASCADE,
+                client_id INT NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+                test_drive_date DATE NOT NULL,
+                status VARCHAR(20) NOT NULL
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="17" author="user">
+        <sql>
+            CREATE TABLE dealers_cars (
+                id SERIAL PRIMARY KEY,
+                dealer_id INT NOT NULL REFERENCES dealers(id),
+                car_id INT NOT NULL REFERENCES cars(id),
+                price DECIMAL(10, 2) NOT NULL
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="18" author="user">
+        <sql>
+            CREATE TABLE dealers_contacts (
+                dealer_id INT NOT NULL REFERENCES dealers(id) ON DELETE CASCADE,
+                contact_id INT NOT NULL REFERENCES contacts(id) ON DELETE CASCADE,
+                PRIMARY KEY (dealer_id, contact_id)
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="19" author="user">
+        <sql>
+            CREATE TABLE autosalons_contacts (
+                autosalon_id INT NOT NULL REFERENCES autosalons(id) ON DELETE CASCADE,
+                contact_id INT NOT NULL REFERENCES contacts(id) ON DELETE CASCADE,
+                PRIMARY KEY (autosalon_id, contact_id)
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="20" author="user">
+        <sql>
+            CREATE TABLE persons_contacts (
+                person_id INT NOT NULL REFERENCES persons(id) ON DELETE CASCADE,
+                contact_id INT NOT NULL REFERENCES contacts(id) ON DELETE CASCADE,
+                PRIMARY KEY (person_id, contact_id)
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="21" author="user">
+        <sql>
+            CREATE TABLE cars_reviews (
+                car_id INT NOT NULL REFERENCES cars(id) ON DELETE CASCADE,
+                review_id INT NOT NULL REFERENCES reviews(id) ON DELETE CASCADE,
+                PRIMARY KEY (car_id, review_id)
+            );
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

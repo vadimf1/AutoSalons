@@ -12,5 +12,5 @@ public interface DealerCarService {
     void updateDealerCar(int id, DealerCarRequestDto dealerCarDto);
     void deleteDealerCarById(Integer id);
     List<DealerCarResponseDto> getDealersCarByCarId(int carId);
-    List<DealerCarResponseDto> getDealersCarsByDealerId(int dealerId);
+    List<DealerCarResponseDto> getDealerCarsByDealerId(int dealerId);
 }

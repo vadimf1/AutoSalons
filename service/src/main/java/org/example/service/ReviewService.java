@@ -11,11 +11,11 @@ public interface ReviewService {
     List<ReviewResponseDto> getAllReviews();
     ReviewResponseDto getReviewById(int reviewId);
     void addReview(ReviewRequestDto reviewDto);
-    List<ReviewResponseDto> getReviewByClientId(int clientId);
+    List<ReviewResponseDto> getReviewsByClientId(int clientId);
     void updateReview(int id, ReviewRequestDto updatedReviewDto);
     void deleteReviewById(int reviewId);
-    List<ReviewResponseDto> getReviewByCarId(int carId);
-    List<ReviewResponseDto> getReviewByAutoSalonId(int autoSalonId);
-    List<ReviewResponseDto> getReviewByDealerId(int dealerId);
+    List<ReviewResponseDto> getReviewsByCarId(int carId);
+    List<ReviewResponseDto> getReviewsByAutoSalonId(int autoSalonId);
+    List<ReviewResponseDto> getReviewsByDealerId(int dealerId);
     List<ReviewResponseDto> getFilteredReviews(ReviewFilterRequest reviewFilterRequest);
 }

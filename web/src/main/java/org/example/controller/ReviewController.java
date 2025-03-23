@@ -42,26 +42,26 @@ public class ReviewController {
 
     @GetMapping("/client/{clientId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<ReviewResponseDto>> getReviewByClientId(@PathVariable int clientId) {
-        return ResponseEntity.ok(reviewService.getReviewByClientId(clientId));
+    public ResponseEntity<List<ReviewResponseDto>> getReviewsByClientId(@PathVariable int clientId) {
+        return ResponseEntity.ok(reviewService.getReviewsByClientId(clientId));
     }
 
     @GetMapping("/car/{carId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<ReviewResponseDto>> getReviewByCarId(@PathVariable int carId) {
-        return ResponseEntity.ok(reviewService.getReviewByCarId(carId));
+    public ResponseEntity<List<ReviewResponseDto>> getReviewsByCarId(@PathVariable int carId) {
+        return ResponseEntity.ok(reviewService.getReviewsByCarId(carId));
     }
 
     @GetMapping("/auto-salon/{autoSalonId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<ReviewResponseDto>> getReviewByAutoSalonId(@PathVariable int autoSalonId) {
-        return ResponseEntity.ok(reviewService.getReviewByAutoSalonId(autoSalonId));
+    public ResponseEntity<List<ReviewResponseDto>> getReviewsByAutoSalonId(@PathVariable int autoSalonId) {
+        return ResponseEntity.ok(reviewService.getReviewsByAutoSalonId(autoSalonId));
     }
 
     @GetMapping("/dealer/{dealerId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<ReviewResponseDto>> getReviewByDealerId(@PathVariable int dealerId) {
-        return ResponseEntity.ok(reviewService.getReviewByDealerId(dealerId));
+    public ResponseEntity<List<ReviewResponseDto>> getReviewsByDealerId(@PathVariable int dealerId) {
+        return ResponseEntity.ok(reviewService.getReviewsByDealerId(dealerId));
     }
 
     @PostMapping("/filter")

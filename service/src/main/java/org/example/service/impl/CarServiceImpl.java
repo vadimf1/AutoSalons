@@ -57,10 +57,6 @@ public class CarServiceImpl implements CarService {
 
     private void addAutoSalonsToCar(Car car, List<Integer> autoSalonIds) {
         for (Integer autoSalonId : autoSalonIds) {
-            if (autoSalonId == null) {
-                throw new ServiceException(CarExceptionCode.ID_FIELD_EXPECTED_NULL.getMessage());
-            }
-
             AutoSalon autoSalon = autoSalonRepository.findById(autoSalonId)
                     .orElseThrow(() -> new ServiceException(AutoSalonExceptionCode.AUTO_SALON_NOT_FOUNT_BY_ID.getMessage() + autoSalonId));
 

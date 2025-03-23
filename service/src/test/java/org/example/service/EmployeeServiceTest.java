@@ -11,7 +11,11 @@ import org.example.model.Person;
 import org.example.model.User;
 import org.example.repository.*;
 import org.example.service.impl.EmployeeServiceImpl;
+import org.example.util.error.AddressExceptionCode;
+import org.example.util.error.AutoSalonExceptionCode;
 import org.example.util.error.EmployeeExceptionCode;
+import org.example.util.error.PersonExceptionCode;
+import org.example.util.error.UserExceptionCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -134,8 +138,149 @@ class EmployeeServiceTest {
 
     @Test
     void deleteEmployeeById_ShouldDeleteEmployee() {
-        doNothing().when(employeeRepository).deleteById(1);
+        when(employeeRepository.findById(1)).thenReturn(Optional.of(employee));
         employeeService.deleteEmployeeById(1);
         verify(employeeRepository, times(1)).deleteById(1);
+    }
+
+    @Test
+    void addEmployee_ShouldThrowException_WhenPersonNotFound() {
+        when(employeeMapper.toEntity(employeeRequestDto)).thenReturn(employee);
+        when(personRepository.findById(employeeRequestDto.getPersonId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                employeeService.addEmployee(employeeRequestDto));
+
+        assertEquals(PersonExceptionCode.PERSON_NOT_FOUNT_BY_ID.getMessage() + employeeRequestDto.getPersonId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void addEmployee_ShouldThrowException_WhenUserNotFound() {
+        when(employeeMapper.toEntity(employeeRequestDto)).thenReturn(employee);
+        when(personRepository.findById(employeeRequestDto.getPersonId())).thenReturn(Optional.of(person));
+        when(userRepository.findById(employeeRequestDto.getUserId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                employeeService.addEmployee(employeeRequestDto));
+
+        assertEquals(UserExceptionCode.USER_NOT_FOUND_BY_ID.getMessage() + employeeRequestDto.getUserId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void addEmployee_ShouldThrowException_WhenAutoSalonNotFound() {
+        when(employeeMapper.toEntity(employeeRequestDto)).thenReturn(employee);
+        when(personRepository.findById(employeeRequestDto.getPersonId())).thenReturn(Optional.of(person));
+        when(userRepository.findById(employeeRequestDto.getUserId())).thenReturn(Optional.of(user));
+        when(autoSalonRepository.findById(employeeRequestDto.getAutoSalonId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                employeeService.addEmployee(employeeRequestDto));
+
+        assertEquals(AutoSalonExceptionCode.AUTO_SALON_NOT_FOUNT_BY_ID.getMessage() + employeeRequestDto.getAutoSalonId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void addEmployee_ShouldThrowException_WhenAddressNotFound() {
+        when(employeeMapper.toEntity(employeeRequestDto)).thenReturn(employee);
+        when(personRepository.findById(employeeRequestDto.getPersonId())).thenReturn(Optional.of(person));
+        when(userRepository.findById(employeeRequestDto.getUserId())).thenReturn(Optional.of(user));
+        when(autoSalonRepository.findById(employeeRequestDto.getAutoSalonId())).thenReturn(Optional.of(autoSalon));
+        when(addressRepository.findById(employeeRequestDto.getAddressId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                employeeService.addEmployee(employeeRequestDto));
+
+        assertEquals(AddressExceptionCode.ADDRESS_NOT_FOUNT_BY_ID.getMessage() + employeeRequestDto.getAddressId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void getEmployeeById_ShouldThrowException_WhenEmployeeNotFound() {
+        when(employeeRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                employeeService.getEmployeeById(1));
+
+        assertEquals(EmployeeExceptionCode.EMPLOYEE_NOT_FOUND_BY_ID.getMessage() + 1,
+                exception.getMessage());
+    }
+
+    @Test
+    void updateEmployee_ShouldThrowException_WhenEmployeeNotFound() {
+        when(employeeRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                employeeService.updateEmployee(1, employeeRequestDto));
+
+        assertEquals(EmployeeExceptionCode.EMPLOYEE_NOT_FOUND_BY_ID.getMessage() + 1,
+                exception.getMessage());
+    }
+
+    @Test
+    void updateEmployee_ShouldThrowException_WhenPersonNotFound() {
+        when(employeeRepository.findById(1)).thenReturn(Optional.of(employee));
+        when(personRepository.findById(employeeRequestDto.getPersonId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                employeeService.updateEmployee(1, employeeRequestDto));
+
+        assertEquals(PersonExceptionCode.PERSON_NOT_FOUNT_BY_ID.getMessage() + employeeRequestDto.getPersonId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void updateEmployee_ShouldThrowException_WhenUserNotFound() {
+        when(employeeRepository.findById(1)).thenReturn(Optional.of(employee));
+        when(personRepository.findById(employeeRequestDto.getPersonId())).thenReturn(Optional.of(person));
+        when(userRepository.findById(employeeRequestDto.getUserId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                employeeService.updateEmployee(1, employeeRequestDto));
+
+        assertEquals(UserExceptionCode.USER_NOT_FOUND_BY_ID.getMessage() + employeeRequestDto.getUserId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void updateEmployee_ShouldThrowException_WhenAutoSalonNotFound() {
+        when(employeeRepository.findById(1)).thenReturn(Optional.of(employee));
+        when(personRepository.findById(employeeRequestDto.getPersonId())).thenReturn(Optional.of(person));
+        when(userRepository.findById(employeeRequestDto.getUserId())).thenReturn(Optional.of(user));
+        when(autoSalonRepository.findById(employeeRequestDto.getAutoSalonId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                employeeService.updateEmployee(1, employeeRequestDto));
+
+        assertEquals(AutoSalonExceptionCode.AUTO_SALON_NOT_FOUNT_BY_ID.getMessage() + employeeRequestDto.getAutoSalonId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void updateEmployee_ShouldThrowException_WhenAddressNotFound() {
+        when(employeeRepository.findById(1)).thenReturn(Optional.of(employee));
+        when(personRepository.findById(employeeRequestDto.getPersonId())).thenReturn(Optional.of(person));
+        when(userRepository.findById(employeeRequestDto.getUserId())).thenReturn(Optional.of(user));
+        when(autoSalonRepository.findById(employeeRequestDto.getAutoSalonId())).thenReturn(Optional.of(autoSalon));
+        when(addressRepository.findById(employeeRequestDto.getAddressId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                employeeService.updateEmployee(1, employeeRequestDto));
+
+        assertEquals(AddressExceptionCode.ADDRESS_NOT_FOUNT_BY_ID.getMessage() + employeeRequestDto.getAddressId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void deleteEmployeeById_ShouldThrowException_WhenEmployeeNotFound() {
+        when(employeeRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                employeeService.deleteEmployeeById(1));
+
+        assertEquals(EmployeeExceptionCode.EMPLOYEE_NOT_FOUND_BY_ID.getMessage() + 1,
+                exception.getMessage());
     }
 }

@@ -40,8 +40,8 @@ public class DealerCarController {
 
     @GetMapping("/dealer/{dealerId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<DealerCarResponseDto>> getDealersCarsByDealerId(@PathVariable int dealerId) {
-        return ResponseEntity.ok(dealerCarService.getDealersCarsByDealerId(dealerId));
+    public ResponseEntity<List<DealerCarResponseDto>> getDealerCarsByDealerId(@PathVariable int dealerId) {
+        return ResponseEntity.ok(dealerCarService.getDealerCarsByDealerId(dealerId));
     }
 
     @Loggable
@@ -63,6 +63,6 @@ public class DealerCarController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteDealerCar(@PathVariable("id") Integer id) {
         dealerCarService.deleteDealerCarById(id);
-        return ResponseEntity.ok("Dealer car added successfully");
+        return ResponseEntity.ok("Dealer car deleted successfully");
     }
 }

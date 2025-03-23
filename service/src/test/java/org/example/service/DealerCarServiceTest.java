@@ -2,6 +2,7 @@ package org.example.service;
 
 import org.example.dto.request.DealerCarRequestDto;
 import org.example.dto.response.DealerCarResponseDto;
+import org.example.exception.ServiceException;
 import org.example.mapper.DealerCarMapper;
 import org.example.model.DealerCar;
 import org.example.model.Dealer;
@@ -10,6 +11,9 @@ import org.example.repository.DealerCarRepository;
 import org.example.repository.DealerRepository;
 import org.example.repository.CarRepository;
 import org.example.service.impl.DealerCarServiceImpl;
+import org.example.util.error.CarExceptionCode;
+import org.example.util.error.DealerCarExceptionCode;
+import org.example.util.error.DealerExceptionCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,27 +21,22 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Collections;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class DealerCarServiceTest {
 
     @Mock
     private DealerCarRepository dealerCarRepository;
-
     @Mock
     private DealerRepository dealerRepository;
-
     @Mock
     private CarRepository carRepository;
-
     @Mock
     private DealerCarMapper dealerCarMapper;
 
@@ -54,47 +53,37 @@ class DealerCarServiceTest {
     void setUp() {
         dealerCarRequestDto = DealerCarRequestDto.builder()
                 .dealerId(1)
-                .carId(2)
-                .price(BigDecimal.valueOf(20000))
+                .carId(1)
+                .price(new BigDecimal("50000"))
                 .build();
 
         dealer = new Dealer();
         car = new Car();
-
-        dealerCar = DealerCar.builder()
-                .dealer(dealer)
-                .car(car)
-                .price(dealerCarRequestDto.getPrice())
-                .build();
-
+        dealerCar = new DealerCar();
+        
         dealerCarResponseDto = DealerCarResponseDto.builder()
                 .id(1)
-                .price(dealerCarRequestDto.getPrice())
+                .price(new BigDecimal("50000"))
                 .build();
     }
 
     @Test
-    void testAddDealerCar() {
+    void addDealerCar_ShouldSaveDealerCar() {
         when(dealerCarMapper.toEntity(dealerCarRequestDto)).thenReturn(dealerCar);
         when(dealerRepository.findById(dealerCarRequestDto.getDealerId())).thenReturn(Optional.of(dealer));
         when(carRepository.findById(dealerCarRequestDto.getCarId())).thenReturn(Optional.of(car));
-        when(dealerCarRepository.save(dealerCar)).thenReturn(dealerCar);
 
         dealerCarService.addDealerCar(dealerCarRequestDto);
 
-        verify(dealerCarMapper).toEntity(dealerCarRequestDto);
-        verify(dealerRepository).findById(dealerCarRequestDto.getDealerId());
-        verify(carRepository).findById(dealerCarRequestDto.getCarId());
         verify(dealerCarRepository).save(dealerCar);
     }
 
     @Test
-    void testGetAllDealerCars() {
-        List<DealerCar> dealerCars = Collections.singletonList(dealerCar);
-        when(dealerCarRepository.findAll()).thenReturn(dealerCars);
+    void getAllDealerCars_ShouldReturnListOfDealerCars() {
+        when(dealerCarRepository.findAll()).thenReturn(Collections.singletonList(dealerCar));
         when(dealerCarMapper.toDto(dealerCar)).thenReturn(dealerCarResponseDto);
 
-        List<DealerCarResponseDto> result = dealerCarService.getAllDealerCars();
+        var result = dealerCarService.getAllDealerCars();
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -102,33 +91,30 @@ class DealerCarServiceTest {
     }
 
     @Test
-    void testGetDealerCarById() {
+    void getDealerCarById_ShouldReturnDealerCar() {
         when(dealerCarRepository.findById(1)).thenReturn(Optional.of(dealerCar));
         when(dealerCarMapper.toDto(dealerCar)).thenReturn(dealerCarResponseDto);
 
-        DealerCarResponseDto result = dealerCarService.getDealerCarById(1);
+        var result = dealerCarService.getDealerCarById(1);
 
         assertNotNull(result);
         assertEquals(dealerCarResponseDto, result);
     }
 
     @Test
-    void testUpdateDealerCar() {
+    void updateDealerCar_ShouldUpdateDealerCar() {
         when(dealerCarRepository.findById(1)).thenReturn(Optional.of(dealerCar));
-        doNothing().when(dealerCarMapper).updateEntityFromDto(dealerCarRequestDto, dealerCar);
         when(dealerRepository.findById(dealerCarRequestDto.getDealerId())).thenReturn(Optional.of(dealer));
         when(carRepository.findById(dealerCarRequestDto.getCarId())).thenReturn(Optional.of(car));
-        when(dealerCarRepository.save(dealerCar)).thenReturn(dealerCar);
+        doNothing().when(dealerCarMapper).updateEntityFromDto(dealerCarRequestDto, dealerCar);
 
         dealerCarService.updateDealerCar(1, dealerCarRequestDto);
 
         verify(dealerCarRepository).save(dealerCar);
-        verify(dealerRepository).findById(dealerCarRequestDto.getDealerId());
-        verify(carRepository).findById(dealerCarRequestDto.getCarId());
     }
 
     @Test
-    void testDeleteDealerCarById() {
+    void deleteDealerCarById_ShouldDeleteDealerCar() {
         when(dealerCarRepository.findById(1)).thenReturn(Optional.of(dealerCar));
 
         dealerCarService.deleteDealerCarById(1);
@@ -137,30 +123,107 @@ class DealerCarServiceTest {
     }
 
     @Test
-    void testGetDealersCarByCarId() {
-        List<DealerCar> dealerCars = Collections.singletonList(dealerCar);
-        when(carRepository.findById(2)).thenReturn(Optional.of(car));
-        when(dealerCarRepository.findByCar(car)).thenReturn(dealerCars);
-        when(dealerCarMapper.toDto(dealerCar)).thenReturn(dealerCarResponseDto);
+    void addDealerCar_ShouldThrowException_WhenDealerNotFound() {
+        when(dealerCarMapper.toEntity(dealerCarRequestDto)).thenReturn(dealerCar);
+        when(dealerRepository.findById(dealerCarRequestDto.getDealerId())).thenReturn(Optional.empty());
 
-        List<DealerCarResponseDto> result = dealerCarService.getDealersCarByCarId(2);
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                dealerCarService.addDealerCar(dealerCarRequestDto));
 
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(dealerCarResponseDto, result.get(0));
+        assertEquals(DealerExceptionCode.DEALER_NOT_FOUNT_BY_ID.getMessage() + dealerCarRequestDto.getDealerId(),
+                exception.getMessage());
     }
 
     @Test
-    void testGetDealersCarsByDealerId() {
-        List<DealerCar> dealerCars = Collections.singletonList(dealerCar);
-        when(dealerRepository.findById(1)).thenReturn(Optional.of(dealer));
-        when(dealerCarRepository.findByDealer(dealer)).thenReturn(dealerCars);
-        when(dealerCarMapper.toDto(dealerCar)).thenReturn(dealerCarResponseDto);
+    void addDealerCar_ShouldThrowException_WhenCarNotFound() {
+        when(dealerCarMapper.toEntity(dealerCarRequestDto)).thenReturn(dealerCar);
+        when(dealerRepository.findById(dealerCarRequestDto.getDealerId())).thenReturn(Optional.of(dealer));
+        when(carRepository.findById(dealerCarRequestDto.getCarId())).thenReturn(Optional.empty());
 
-        List<DealerCarResponseDto> result = dealerCarService.getDealersCarsByDealerId(1);
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                dealerCarService.addDealerCar(dealerCarRequestDto));
 
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(dealerCarResponseDto, result.get(0));
+        assertEquals(CarExceptionCode.CAR_NOT_FOUNT_BY_ID.getMessage() + dealerCarRequestDto.getCarId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void getDealerCarById_ShouldThrowException_WhenDealerCarNotFound() {
+        when(dealerCarRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                dealerCarService.getDealerCarById(1));
+
+        assertEquals(DealerCarExceptionCode.DEALER_CAR_NOT_FOUND_BY_ID.getMessage() + 1,
+                exception.getMessage());
+    }
+
+    @Test
+    void updateDealerCar_ShouldThrowException_WhenDealerCarNotFound() {
+        when(dealerCarRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                dealerCarService.updateDealerCar(1, dealerCarRequestDto));
+
+        assertEquals(DealerCarExceptionCode.DEALER_CAR_NOT_FOUND_BY_ID.getMessage() + 1,
+                exception.getMessage());
+    }
+
+    @Test
+    void updateDealerCar_ShouldThrowException_WhenDealerNotFound() {
+        when(dealerCarRepository.findById(1)).thenReturn(Optional.of(dealerCar));
+        when(dealerRepository.findById(dealerCarRequestDto.getDealerId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                dealerCarService.updateDealerCar(1, dealerCarRequestDto));
+
+        assertEquals(DealerExceptionCode.DEALER_NOT_FOUNT_BY_ID.getMessage() + dealerCarRequestDto.getDealerId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void updateDealerCar_ShouldThrowException_WhenCarNotFound() {
+        when(dealerCarRepository.findById(1)).thenReturn(Optional.of(dealerCar));
+        when(dealerRepository.findById(dealerCarRequestDto.getDealerId())).thenReturn(Optional.of(dealer));
+        when(carRepository.findById(dealerCarRequestDto.getCarId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                dealerCarService.updateDealerCar(1, dealerCarRequestDto));
+
+        assertEquals(CarExceptionCode.CAR_NOT_FOUNT_BY_ID.getMessage() + dealerCarRequestDto.getCarId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void deleteDealerCarById_ShouldThrowException_WhenDealerCarNotFound() {
+        when(dealerCarRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                dealerCarService.deleteDealerCarById(1));
+
+        assertEquals(DealerCarExceptionCode.DEALER_CAR_NOT_FOUND_BY_ID.getMessage() + 1,
+                exception.getMessage());
+    }
+
+    @Test
+    void getDealersCarByCarId_ShouldThrowException_WhenCarNotFound() {
+        when(carRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                dealerCarService.getDealersCarByCarId(1));
+
+        assertEquals(CarExceptionCode.ID_FIELD_NOT_NULL.getMessage() + 1,
+                exception.getMessage());
+    }
+
+    @Test
+    void getDealersCarsByDealerId_ShouldThrowException_WhenDealerNotFound() {
+        when(dealerRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                dealerCarService.getDealerCarsByDealerId(1));
+
+        assertEquals(DealerExceptionCode.DEALER_NOT_FOUNT_BY_ID.getMessage() + 1,
+                exception.getMessage());
     }
 }

@@ -1,88 +1,136 @@
 package org.example.service;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.security.SignatureException;
+import org.example.model.Role;
 import org.example.model.User;
 import org.example.service.impl.JwtSecurityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(MockitoExtension.class)
 class JwtSecurityServiceTest {
 
+    @InjectMocks
     private JwtSecurityService jwtSecurityService;
-    private UserDetails userDetails;
-    private final String SECRET_KEY = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
-    private final long ACCESS_TOKEN_EXPIRATION = 3600000;
-    private final long REFRESH_TOKEN_EXPIRATION = 86400000;
+
+    private User user;
+    private static final String SECRET_KEY = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
+    private static final long ACCESS_TOKEN_EXPIRATION = 3600000;
+    private static final long REFRESH_TOKEN_EXPIRATION = 86400000;
 
     @BeforeEach
     void setUp() {
-        jwtSecurityService = new JwtSecurityService();
+        user = User.builder()
+                .id(1)
+                .username("testuser")
+                .password("password")
+                .role(Role.CLIENT)
+                .build();
+
         ReflectionTestUtils.setField(jwtSecurityService, "SECRET_KEY", SECRET_KEY);
         ReflectionTestUtils.setField(jwtSecurityService, "ACCESS_TOKEN_EXPIRATION", ACCESS_TOKEN_EXPIRATION);
         ReflectionTestUtils.setField(jwtSecurityService, "REFRESH_TOKEN_EXPIRATION", REFRESH_TOKEN_EXPIRATION);
-
-        userDetails = User.builder()
-                .username("testuser")
-                .password("password123")
-                .build();
     }
 
     @Test
     void generateToken_ShouldGenerateValidToken() {
-        String token = jwtSecurityService.generateToken(userDetails);
+        String token = jwtSecurityService.generateToken(user);
 
         assertNotNull(token);
-        assertTrue(token.length() > 0);
+        assertTrue(jwtSecurityService.validateToken(token, user));
+        assertEquals(user.getUsername(), jwtSecurityService.extractUsername(token));
     }
 
     @Test
     void generateRefreshToken_ShouldGenerateValidToken() {
         Map<String, String> claims = new HashMap<>();
         claims.put("type", "refresh");
+        
+        String refreshToken = jwtSecurityService.generateRefreshToken(claims, user);
 
-        String token = jwtSecurityService.generateRefreshToken(claims, userDetails);
-
-        assertNotNull(token);
-        assertTrue(token.length() > 0);
+        assertNotNull(refreshToken);
+        assertTrue(jwtSecurityService.validateToken(refreshToken, user));
+        assertEquals(user.getUsername(), jwtSecurityService.extractUsername(refreshToken));
     }
 
     @Test
     void extractUsername_ShouldReturnCorrectUsername() {
-        String token = jwtSecurityService.generateToken(userDetails);
-
+        String token = jwtSecurityService.generateToken(user);
         String username = jwtSecurityService.extractUsername(token);
 
-        assertEquals(userDetails.getUsername(), username);
+        assertEquals(user.getUsername(), username);
     }
 
     @Test
-    void isTokenValid_WithValidToken_ShouldReturnTrue() {
-        String token = jwtSecurityService.generateToken(userDetails);
+    void validateToken_ShouldReturnTrue_WhenTokenIsValid() {
+        String token = jwtSecurityService.generateToken(user);
 
-        boolean isValid = jwtSecurityService.validateToken(token, userDetails);
-
-        assertTrue(isValid);
+        assertTrue(jwtSecurityService.validateToken(token, user));
     }
 
     @Test
-    void isTokenValid_WithInvalidUsername_ShouldReturnFalse() {
-        String token = jwtSecurityService.generateToken(userDetails);
-        UserDetails differentUser = User.builder()
-                .username("different")
-                .password("password123")
+    void validateToken_ShouldReturnFalse_WhenUsernameDoesNotMatch() {
+        String token = jwtSecurityService.generateToken(user);
+
+        User anotherUser = User.builder()
+                .id(2)
+                .username("anotheruser")
+                .password("password")
+                .role(Role.CLIENT)
                 .build();
 
-        boolean isValid = jwtSecurityService.validateToken(token, differentUser);
+        assertFalse(jwtSecurityService.validateToken(token, anotherUser));
+    }
 
-        assertFalse(isValid);
+    @Test
+    void extractUsername_ShouldThrowException_WhenTokenIsInvalid() {
+        String invalidToken = "invalid.token.string";
+
+        assertThrows(MalformedJwtException.class, () ->
+                jwtSecurityService.extractUsername(invalidToken));
+    }
+
+    @Test
+    void extractUsername_ShouldThrowException_WhenTokenIsExpired() {
+        ReflectionTestUtils.setField(jwtSecurityService, "ACCESS_TOKEN_EXPIRATION", 1);
+        String token = jwtSecurityService.generateToken(user);
+
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        assertThrows(ExpiredJwtException.class, () ->
+                jwtSecurityService.extractUsername(token));
+    }
+
+    @Test
+    void extractExpiration_ShouldReturnCorrectDate() {
+        String token = jwtSecurityService.generateToken(user);
+        Date expiration = jwtSecurityService.extractExpiration(token);
+
+        assertNotNull(expiration);
+        assertTrue(expiration.after(new Date()));
+    }
+
+    @Test
+    void isTokenExpired_ShouldReturnFalse_WhenTokenIsValid() {
+        String token = jwtSecurityService.generateToken(user);
+
+        assertFalse(jwtSecurityService.isTokenExpired(token));
     }
 } 

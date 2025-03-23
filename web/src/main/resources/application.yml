@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/autosalons?stringtype=unspecified
+    url: jdbc:postgresql://db:5432/autosalons?stringtype=unspecified
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
@@ -8,6 +8,8 @@ spring:
     hibernate:
       ddl-auto: none
     show-sql: true
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.xml
 
 jwt:
   secret: Y2mEHclUKTnwfxT9V+0YECgdn8r7Ieryk2e7IraH8k0=

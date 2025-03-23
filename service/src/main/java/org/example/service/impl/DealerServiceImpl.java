@@ -13,6 +13,7 @@ import org.example.repository.ContactRepository;
 import org.example.repository.DealerRepository;
 import org.example.repository.specification.DealerSpecification;
 import org.example.service.DealerService;
+import org.example.util.error.AddressExceptionCode;
 import org.example.util.error.ContactExceptionCode;
 import org.example.util.error.DealerExceptionCode;
 import org.springframework.stereotype.Service;
@@ -47,7 +48,7 @@ public class DealerServiceImpl implements DealerService {
     private void addRelationsToDealer(Dealer dealer, int addressId, List<Integer> contactIds) {
         dealer.setAddress(
                 addressRepository.findById(addressId)
-                        .orElseThrow(() -> new ServiceException(DealerExceptionCode.DEALER_NOT_FOUNT_BY_ID.getMessage() + addressId))
+                        .orElseThrow(() -> new ServiceException(AddressExceptionCode.ADDRESS_NOT_FOUNT_BY_ID.getMessage() + addressId))
         );
 
         dealer.setContacts(new HashSet<>());

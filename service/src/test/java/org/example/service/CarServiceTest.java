@@ -3,6 +3,7 @@ package org.example.service;
 import org.example.dto.request.AddCarDto;
 import org.example.dto.request.UpdateCarDto;
 import org.example.dto.response.CarResponseDto;
+import org.example.exception.ServiceException;
 import org.example.model.AutoSalon;
 import org.example.model.Car;
 import org.example.model.Dealer;
@@ -13,6 +14,9 @@ import org.example.repository.DealerCarRepository;
 import org.example.repository.DealerRepository;
 import org.example.mapper.CarMapper;
 import org.example.service.impl.CarServiceImpl;
+import org.example.util.error.AutoSalonExceptionCode;
+import org.example.util.error.CarExceptionCode;
+import org.example.util.error.DealerExceptionCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doNothing;
@@ -178,5 +183,74 @@ class CarServiceTest {
         carService.deleteCarById(1);
 
         verify(carRepository).deleteById(1);
+    }
+
+    @Test
+    void addCar_ShouldThrowException_WhenDealerNotFound() {
+        when(dealerRepository.findById(addCarDto.getDealerId())).thenReturn(Optional.empty());
+        when(autoSalonRepository.findById(anyInt())).thenReturn(Optional.of(autoSalon));
+        when(carMapper.toEntity(addCarDto)).thenReturn(car);
+        
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                carService.addCar(addCarDto));
+        
+        assertEquals(DealerExceptionCode.DEALER_NOT_FOUNT_BY_ID.getMessage() + addCarDto.getDealerId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void addCar_ShouldThrowException_WhenAutoSalonNotFound() {
+        when(autoSalonRepository.findById(anyInt())).thenReturn(Optional.empty());
+        
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                carService.addCar(addCarDto));
+        
+        assertEquals(AutoSalonExceptionCode.AUTO_SALON_NOT_FOUNT_BY_ID.getMessage() + addCarDto.getAutoSalonIds().get(0), 
+                exception.getMessage());
+    }
+
+    @Test
+    void getCarById_ShouldThrowException_WhenCarNotFound() {
+        when(carRepository.findById(1)).thenReturn(Optional.empty());
+        
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                carService.getCarById(1));
+        
+        assertEquals(CarExceptionCode.CAR_NOT_FOUNT_BY_ID.getMessage() + 1, 
+                exception.getMessage());
+    }
+
+    @Test
+    void updateCar_ShouldThrowException_WhenCarNotFound() {
+        when(carRepository.findById(1)).thenReturn(Optional.empty());
+        
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                carService.updateCar(1, updateCarDto));
+        
+        assertEquals(CarExceptionCode.CAR_NOT_FOUNT_BY_ID.getMessage() + 1,
+                exception.getMessage());
+    }
+
+    @Test
+    void updateCar_ShouldThrowException_WhenAutoSalonNotFound() {
+        when(carRepository.findById(1)).thenReturn(Optional.of(car));
+        when(autoSalonRepository.findById(anyInt())).thenReturn(Optional.empty());
+        
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                carService.updateCar(1, updateCarDto));
+        
+        assertEquals(AutoSalonExceptionCode.AUTO_SALON_NOT_FOUNT_BY_ID.getMessage() + updateCarDto.getAutoSalonIds().get(0),
+                exception.getMessage());
+    }
+
+    @Test
+    void deleteCarById_ShouldThrowException_WhenCarNotFound() {
+        when(carRepository.findById(1)).thenReturn(Optional.empty());
+        
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                carService.deleteCarById(1));
+        
+        assertEquals(CarExceptionCode.CAR_NOT_FOUNT_BY_ID.getMessage() + 1, 
+                exception.getMessage());
     }
 }

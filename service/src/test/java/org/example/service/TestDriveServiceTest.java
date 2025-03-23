@@ -2,6 +2,7 @@ package org.example.service;
 
 import org.example.dto.request.TestDriveRequestDto;
 import org.example.dto.response.TestDriveResponseDto;
+import org.example.exception.ServiceException;
 import org.example.mapper.TestDriveMapper;
 import org.example.model.TestDrive;
 import org.example.model.AutoSalon;
@@ -12,6 +13,10 @@ import org.example.repository.AutoSalonRepository;
 import org.example.repository.CarRepository;
 import org.example.repository.ClientRepository;
 import org.example.service.impl.TestDriveServiceImpl;
+import org.example.util.error.AutoSalonExceptionCode;
+import org.example.util.error.CarExceptionCode;
+import org.example.util.error.ClientExceptionCode;
+import org.example.util.error.TestDriveExceptionCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,6 +30,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -70,14 +76,7 @@ class TestDriveServiceTest {
         autoSalon = new AutoSalon();
         car = new Car();
         client = new Client();
-
-        testDrive = TestDrive.builder()
-                .autoSalon(autoSalon)
-                .car(car)
-                .client(client)
-                .testDriveDate(LocalDate.now())
-                .status("Scheduled")
-                .build();
+        testDrive = new TestDrive();
 
         testDriveResponseDto = TestDriveResponseDto.builder()
                 .id(1)
@@ -173,5 +172,116 @@ class TestDriveServiceTest {
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals(testDriveResponseDto, result.get(0));
+    }
+
+    @Test
+    void addTestDrive_ShouldThrowException_WhenAutoSalonNotFound() {
+        when(testDriveMapper.toEntity(testDriveRequestDto)).thenReturn(testDrive);
+        when(autoSalonRepository.findById(testDriveRequestDto.getAutoSalonId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                testDriveService.addTestDrive(testDriveRequestDto));
+
+        assertEquals(AutoSalonExceptionCode.AUTO_SALON_NOT_FOUNT_BY_ID.getMessage() + testDriveRequestDto.getAutoSalonId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void addTestDrive_ShouldThrowException_WhenClientNotFound() {
+        when(testDriveMapper.toEntity(testDriveRequestDto)).thenReturn(testDrive);
+        when(autoSalonRepository.findById(testDriveRequestDto.getAutoSalonId())).thenReturn(Optional.of(autoSalon));
+        when(clientRepository.findById(testDriveRequestDto.getClientId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                testDriveService.addTestDrive(testDriveRequestDto));
+
+        assertEquals(ClientExceptionCode.CLIENT_NOT_FOUND_BY_ID.getMessage() + testDriveRequestDto.getClientId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void addTestDrive_ShouldThrowException_WhenCarNotFound() {
+        when(testDriveMapper.toEntity(testDriveRequestDto)).thenReturn(testDrive);
+        when(autoSalonRepository.findById(testDriveRequestDto.getAutoSalonId())).thenReturn(Optional.of(autoSalon));
+        when(clientRepository.findById(testDriveRequestDto.getClientId())).thenReturn(Optional.of(client));
+        when(carRepository.findById(testDriveRequestDto.getCarId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                testDriveService.addTestDrive(testDriveRequestDto));
+
+        assertEquals(CarExceptionCode.CAR_NOT_FOUNT_BY_ID.getMessage() + testDriveRequestDto.getCarId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void getTestDriveById_ShouldThrowException_WhenTestDriveNotFound() {
+        when(testDriveRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                testDriveService.getTestDriveById(1));
+
+        assertEquals(TestDriveExceptionCode.TEST_DRIVE_NOT_FOUNT_BY_ID.getMessage() + 1,
+                exception.getMessage());
+    }
+
+    @Test
+    void updateTestDrive_ShouldThrowException_WhenTestDriveNotFound() {
+        when(testDriveRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                testDriveService.updateTestDrive(1, testDriveRequestDto));
+
+        assertEquals(TestDriveExceptionCode.TEST_DRIVE_NOT_FOUNT_BY_ID.getMessage() + 1,
+                exception.getMessage());
+    }
+
+    @Test
+    void updateTestDrive_ShouldThrowException_WhenAutoSalonNotFound() {
+        when(testDriveRepository.findById(1)).thenReturn(Optional.of(testDrive));
+        when(autoSalonRepository.findById(testDriveRequestDto.getAutoSalonId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                testDriveService.updateTestDrive(1, testDriveRequestDto));
+
+        assertEquals(AutoSalonExceptionCode.AUTO_SALON_NOT_FOUNT_BY_ID.getMessage() + testDriveRequestDto.getAutoSalonId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void updateTestDrive_ShouldThrowException_WhenClientNotFound() {
+        when(testDriveRepository.findById(1)).thenReturn(Optional.of(testDrive));
+        when(autoSalonRepository.findById(testDriveRequestDto.getAutoSalonId())).thenReturn(Optional.of(autoSalon));
+        when(clientRepository.findById(testDriveRequestDto.getClientId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                testDriveService.updateTestDrive(1, testDriveRequestDto));
+
+        assertEquals(ClientExceptionCode.CLIENT_NOT_FOUND_BY_ID.getMessage() + testDriveRequestDto.getClientId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void updateTestDrive_ShouldThrowException_WhenCarNotFound() {
+        when(testDriveRepository.findById(1)).thenReturn(Optional.of(testDrive));
+        when(autoSalonRepository.findById(testDriveRequestDto.getAutoSalonId())).thenReturn(Optional.of(autoSalon));
+        when(clientRepository.findById(testDriveRequestDto.getClientId())).thenReturn(Optional.of(client));
+        when(carRepository.findById(testDriveRequestDto.getCarId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                testDriveService.updateTestDrive(1, testDriveRequestDto));
+
+        assertEquals(CarExceptionCode.CAR_NOT_FOUNT_BY_ID.getMessage() + testDriveRequestDto.getCarId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void deleteTestDriveById_ShouldThrowException_WhenTestDriveNotFound() {
+        when(testDriveRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                testDriveService.deleteTestDriveById(1));
+
+        assertEquals(TestDriveExceptionCode.TEST_DRIVE_NOT_FOUNT_BY_ID.getMessage() + 1,
+                exception.getMessage());
     }
 }

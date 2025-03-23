@@ -2,12 +2,15 @@ package org.example.service;
 
 import org.example.dto.request.PersonRequestDto;
 import org.example.dto.response.PersonResponseDto;
+import org.example.exception.ServiceException;
 import org.example.mapper.PersonMapper;
 import org.example.model.Person;
 import org.example.model.Contact;
 import org.example.repository.ContactRepository;
 import org.example.repository.PersonRepository;
 import org.example.service.impl.PersonServiceImpl;
+import org.example.util.error.ContactExceptionCode;
+import org.example.util.error.PersonExceptionCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +23,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -113,5 +117,62 @@ class PersonServiceTest {
         personService.deletePersonById(1);
 
         verify(personRepository, times(1)).deleteById(1);
+    }
+
+    @Test
+    void addPerson_ShouldThrowException_WhenContactNotFound() {
+        when(personMapper.toEntity(personRequestDto)).thenReturn(person);
+        when(contactRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                personService.addPerson(personRequestDto));
+
+        assertEquals(ContactExceptionCode.CONTACT_NOT_FOUND_BY_ID.getMessage() + 1,
+                exception.getMessage());
+    }
+
+    @Test
+    void getPersonById_ShouldThrowException_WhenPersonNotFound() {
+        when(personRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                personService.getPersonById(1));
+
+        assertEquals(PersonExceptionCode.PERSON_NOT_FOUNT_BY_ID.getMessage() + 1,
+                exception.getMessage());
+    }
+
+    @Test
+    void updatePerson_ShouldThrowException_WhenPersonNotFound() {
+        when(personRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                personService.updatePerson(1, personRequestDto));
+
+        assertEquals(PersonExceptionCode.PERSON_NOT_FOUNT_BY_ID.getMessage() + 1,
+                exception.getMessage());
+    }
+
+    @Test
+    void updatePerson_ShouldThrowException_WhenContactNotFound() {
+        when(personRepository.findById(1)).thenReturn(Optional.of(person));
+        when(contactRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                personService.updatePerson(1, personRequestDto));
+
+        assertEquals(ContactExceptionCode.CONTACT_NOT_FOUND_BY_ID.getMessage() + 1,
+                exception.getMessage());
+    }
+
+    @Test
+    void deletePersonById_ShouldThrowException_WhenPersonNotFound() {
+        when(personRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                personService.deletePersonById(1));
+
+        assertEquals(PersonExceptionCode.PERSON_NOT_FOUNT_BY_ID.getMessage() + 1,
+                exception.getMessage());
     }
 }

@@ -51,7 +51,7 @@ public class ReviewServiceImpl implements ReviewService {
                         ReviewExceptionCode.REVIEW_NOT_FOUND_BY_ID.getMessage() + reviewId));
     }
 
-    public List<ReviewResponseDto> getReviewByClientId(int clientId) {
+    public List<ReviewResponseDto> getReviewsByClientId(int clientId) {
         return reviewRepository.findByClient(
                     clientRepository.findById(clientId)
                             .orElseThrow(() -> new ServiceException(ClientExceptionCode.CLIENT_NOT_FOUND_BY_ID.getMessage() + clientId))
@@ -61,7 +61,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .toList();
     }
 
-    public List<ReviewResponseDto> getReviewByCarId(int carId) {
+    public List<ReviewResponseDto> getReviewsByCarId(int carId) {
         return reviewRepository.findByCar(
                         carRepository.findById(carId)
                                 .orElseThrow(() -> new ServiceException(CarExceptionCode.CAR_NOT_FOUNT_BY_ID.getMessage() + carId))
@@ -71,7 +71,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .toList();
     }
 
-    public List<ReviewResponseDto> getReviewByAutoSalonId(int autoSalonId) {
+    public List<ReviewResponseDto> getReviewsByAutoSalonId(int autoSalonId) {
         return reviewRepository.findByAutoSalon(
                         autoSalonRepository.findById(autoSalonId)
                                 .orElseThrow(() -> new ServiceException(AutoSalonExceptionCode.AUTO_SALON_NOT_FOUNT_BY_ID.getMessage() + autoSalonId))
@@ -81,7 +81,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .toList();
     }
 
-    public List<ReviewResponseDto> getReviewByDealerId(int dealerId) {
+    public List<ReviewResponseDto> getReviewsByDealerId(int dealerId) {
         return reviewRepository.findByDealer(
                         dealerRepository.findById(dealerId)
                                 .orElseThrow(() -> new ServiceException(DealerExceptionCode.DEALER_NOT_FOUNT_BY_ID.getMessage() + dealerId))

@@ -12,7 +12,9 @@ import org.example.repository.AutoSalonRepository;
 import org.example.repository.ContactRepository;
 import org.example.repository.AddressRepository;
 import org.example.service.impl.AutoSalonServiceImpl;
+import org.example.util.error.AddressExceptionCode;
 import org.example.util.error.AutoSalonExceptionCode;
+import org.example.util.error.ContactExceptionCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,40 +41,41 @@ class AutoSalonServiceTest {
     @Mock
     private AutoSalonRepository autoSalonRepository;
     @Mock
-    private AddressRepository addressRepository;
+    private AutoSalonMapper autoSalonMapper;
     @Mock
     private ContactRepository contactRepository;
     @Mock
-    private AutoSalonMapper autoSalonMapper;
+    private AddressRepository addressRepository;
 
     @InjectMocks
     private AutoSalonServiceImpl autoSalonService;
 
-    private AutoSalon autoSalon;
     private AutoSalonRequestDto autoSalonRequestDto;
+    private AutoSalon autoSalon;
+    private Contact contact;
+    private Address address;
     private AutoSalonResponseDto autoSalonResponseDto;
     private AutoSalonFilterRequest autoSalonFilterRequest;
-    private Address address;
-    private Contact contact;
 
     @BeforeEach
     void setUp() {
-        autoSalon = new AutoSalon();
         autoSalonRequestDto = AutoSalonRequestDto.builder()
                 .name("AutoSalon Name")
                 .addressId(1)
                 .contactIds(List.of(1))
                 .build();
+
+        autoSalon = new AutoSalon();
+        contact = new Contact();
+        address = new Address();
+
         autoSalonResponseDto = AutoSalonResponseDto.builder()
                 .id(1)
                 .name("AutoSalon Name")
                 .build();
+
         autoSalonFilterRequest = AutoSalonFilterRequest.builder()
-                .name("AutoSalon Name")
-                .city("City")
                 .build();
-        address = new Address();
-        contact = new Contact();
     }
 
     @Test
@@ -148,5 +151,88 @@ class AutoSalonServiceTest {
 
         assertEquals(1, result.size());
         assertEquals("AutoSalon Name", result.get(0).getName());
+    }
+
+    @Test
+    void addAutoSalon_ShouldThrowException_WhenAddressNotFound() {
+        when(autoSalonMapper.toEntity(autoSalonRequestDto)).thenReturn(autoSalon);
+        when(addressRepository.findById(autoSalonRequestDto.getAddressId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                autoSalonService.addAutoSalon(autoSalonRequestDto));
+
+        assertEquals(AddressExceptionCode.ADDRESS_NOT_FOUNT_BY_ID.getMessage() + autoSalonRequestDto.getAddressId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void addAutoSalon_ShouldThrowException_WhenContactNotFound() {
+        when(autoSalonMapper.toEntity(autoSalonRequestDto)).thenReturn(autoSalon);
+        when(addressRepository.findById(autoSalonRequestDto.getAddressId())).thenReturn(Optional.of(address));
+        when(contactRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                autoSalonService.addAutoSalon(autoSalonRequestDto));
+
+        assertEquals(ContactExceptionCode.CONTACT_NOT_FOUND_BY_ID.getMessage() + 1,
+                exception.getMessage());
+    }
+
+    @Test
+    void getAutoSalonById_ShouldThrowException_WhenAutoSalonNotFound() {
+        when(autoSalonRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                autoSalonService.getAutoSalonById(1));
+
+        assertEquals(AutoSalonExceptionCode.AUTO_SALON_NOT_FOUNT_BY_ID.getMessage() + 1,
+                exception.getMessage());
+    }
+
+    @Test
+    void updateAutoSalon_ShouldThrowException_WhenAutoSalonNotFound() {
+        when(autoSalonRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                autoSalonService.updateAutoSalon(1, autoSalonRequestDto));
+
+        assertEquals(AutoSalonExceptionCode.AUTO_SALON_NOT_FOUNT_BY_ID.getMessage() + 1,
+                exception.getMessage());
+    }
+
+    @Test
+    void updateAutoSalon_ShouldThrowException_WhenAddressNotFound() {
+        when(autoSalonRepository.findById(1)).thenReturn(Optional.of(autoSalon));
+        when(addressRepository.findById(autoSalonRequestDto.getAddressId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                autoSalonService.updateAutoSalon(1, autoSalonRequestDto));
+
+        assertEquals(AddressExceptionCode.ADDRESS_NOT_FOUNT_BY_ID.getMessage() + autoSalonRequestDto.getAddressId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void updateAutoSalon_ShouldThrowException_WhenContactNotFound() {
+        when(autoSalonRepository.findById(1)).thenReturn(Optional.of(autoSalon));
+        when(addressRepository.findById(autoSalonRequestDto.getAddressId())).thenReturn(Optional.of(address));
+        when(contactRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                autoSalonService.updateAutoSalon(1, autoSalonRequestDto));
+
+        assertEquals(ContactExceptionCode.CONTACT_NOT_FOUND_BY_ID.getMessage() + 1,
+                exception.getMessage());
+    }
+
+    @Test
+    void deleteAutoSalonById_ShouldThrowException_WhenAutoSalonNotFound() {
+        when(autoSalonRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                autoSalonService.deleteAutoSalonById(1));
+
+        assertEquals(AutoSalonExceptionCode.AUTO_SALON_NOT_FOUNT_BY_ID.getMessage() + 1,
+                exception.getMessage());
     }
 }

@@ -80,7 +80,7 @@ public class DealerCarServiceImpl implements DealerCarService {
                 .toList();
     }
 
-    public List<DealerCarResponseDto> getDealersCarsByDealerId(int dealerId) {
+    public List<DealerCarResponseDto> getDealerCarsByDealerId(int dealerId) {
         return dealerCarRepository.findByDealer(
                         dealerRepository.findById(dealerId)
                                 .orElseThrow(() -> new ServiceException(DealerExceptionCode.DEALER_NOT_FOUNT_BY_ID.getMessage() + dealerId))

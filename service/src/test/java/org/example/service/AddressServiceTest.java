@@ -137,4 +137,14 @@ class AddressServiceTest {
 
         verify(addressRepository, times(1)).deleteById(1);
     }
+
+    @Test
+    void updateAddress_ShouldThrowException_WhenInvalidId() {
+        when(addressRepository.findById(-1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                addressService.updateAddress(-1, addressRequestDto));
+
+        assertEquals(AddressExceptionCode.ID_FIELD_EXPECTED_NULL.getMessage() + -1, exception.getMessage());
+    }
 }

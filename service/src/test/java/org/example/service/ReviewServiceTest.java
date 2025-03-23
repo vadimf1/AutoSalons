@@ -16,6 +16,11 @@ import org.example.repository.CarRepository;
 import org.example.repository.ClientRepository;
 import org.example.service.impl.ReviewServiceImpl;
 import org.example.exception.ServiceException;
+import org.example.util.error.AutoSalonExceptionCode;
+import org.example.util.error.CarExceptionCode;
+import org.example.util.error.ClientExceptionCode;
+import org.example.util.error.DealerExceptionCode;
+import org.example.util.error.ReviewExceptionCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -83,14 +88,7 @@ class ReviewServiceTest {
         car = new Car();
         autoSalon = new AutoSalon();
         dealer = new Dealer();
-
-        review = Review.builder()
-                .client(client)
-                .description("Great experience!")
-                .rating(5)
-                .autoSalon(autoSalon)
-                .createdAt(LocalDate.now())
-                .build();
+        review = new Review();
 
         reviewResponseDto = ReviewResponseDto.builder()
                 .id(1)
@@ -167,7 +165,7 @@ class ReviewServiceTest {
         when(reviewRepository.findByClient(client)).thenReturn(Collections.singletonList(review));
         when(reviewMapper.toDto(review)).thenReturn(reviewResponseDto);
 
-        var result = reviewService.getReviewByClientId(1);
+        var result = reviewService.getReviewsByClientId(1);
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -197,5 +195,156 @@ class ReviewServiceTest {
         reviewRequestDto.setCarId(2);
 
         assertThrows(ServiceException.class, () -> reviewService.addReview(reviewRequestDto));
+    }
+
+    @Test
+    void addReview_ShouldThrowException_WhenClientNotFound() {
+        when(reviewMapper.toEntity(reviewRequestDto)).thenReturn(review);
+        when(clientRepository.findById(reviewRequestDto.getClientId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                reviewService.addReview(reviewRequestDto));
+
+        assertEquals(ClientExceptionCode.CLIENT_NOT_FOUND_BY_ID.getMessage() + reviewRequestDto.getClientId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void addReview_ShouldThrowException_WhenCarNotFound() {
+        reviewRequestDto.setCarId(1);
+        reviewRequestDto.setDealerId(null);
+        reviewRequestDto.setAutoSalonId(null);
+
+        when(reviewMapper.toEntity(reviewRequestDto)).thenReturn(review);
+        when(clientRepository.findById(reviewRequestDto.getClientId())).thenReturn(Optional.of(client));
+        when(carRepository.findById(reviewRequestDto.getCarId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                reviewService.addReview(reviewRequestDto));
+
+        assertEquals(CarExceptionCode.CAR_NOT_FOUNT_BY_ID.getMessage() + reviewRequestDto.getCarId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void addReview_ShouldThrowException_WhenAutoSalonNotFound() {
+        when(reviewMapper.toEntity(reviewRequestDto)).thenReturn(review);
+        when(clientRepository.findById(reviewRequestDto.getClientId())).thenReturn(Optional.of(client));
+        when(autoSalonRepository.findById(reviewRequestDto.getAutoSalonId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                reviewService.addReview(reviewRequestDto));
+
+        assertEquals(AutoSalonExceptionCode.AUTO_SALON_NOT_FOUNT_BY_ID.getMessage() + reviewRequestDto.getAutoSalonId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void addReview_ShouldThrowException_WhenDealerNotFound() {
+        reviewRequestDto.setCarId(null);
+        reviewRequestDto.setDealerId(1);
+        reviewRequestDto.setAutoSalonId(null);
+
+        when(reviewMapper.toEntity(reviewRequestDto)).thenReturn(review);
+        when(clientRepository.findById(reviewRequestDto.getClientId())).thenReturn(Optional.of(client));
+        when(dealerRepository.findById(reviewRequestDto.getDealerId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                reviewService.addReview(reviewRequestDto));
+
+        assertEquals(DealerExceptionCode.DEALER_NOT_FOUNT_BY_ID.getMessage() + reviewRequestDto.getDealerId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void getReviewById_ShouldThrowException_WhenReviewNotFound() {
+        when(reviewRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                reviewService.getReviewById(1));
+
+        assertEquals(ReviewExceptionCode.REVIEW_NOT_FOUND_BY_ID.getMessage() + 1,
+                exception.getMessage());
+    }
+
+    @Test
+    void updateReview_ShouldThrowException_WhenReviewNotFound() {
+        when(reviewRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                reviewService.updateReview(1, reviewRequestDto));
+
+        assertEquals(ReviewExceptionCode.REVIEW_NOT_FOUND_BY_ID.getMessage() + 1,
+                exception.getMessage());
+    }
+
+    @Test
+    void updateReview_ShouldThrowException_WhenClientNotFound() {
+        when(reviewRepository.findById(1)).thenReturn(Optional.of(review));
+        when(clientRepository.findById(reviewRequestDto.getClientId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                reviewService.updateReview(1, reviewRequestDto));
+
+        assertEquals(ClientExceptionCode.CLIENT_NOT_FOUND_BY_ID.getMessage() + reviewRequestDto.getClientId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void updateReview_ShouldThrowException_WhenCarNotFound() {
+        reviewRequestDto.setCarId(1);
+        reviewRequestDto.setDealerId(null);
+        reviewRequestDto.setAutoSalonId(null);
+
+        when(reviewRepository.findById(1)).thenReturn(Optional.of(review));
+        when(clientRepository.findById(reviewRequestDto.getClientId())).thenReturn(Optional.of(client));
+        when(carRepository.findById(reviewRequestDto.getCarId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                reviewService.updateReview(1, reviewRequestDto));
+
+        assertEquals(CarExceptionCode.CAR_NOT_FOUNT_BY_ID.getMessage() + reviewRequestDto.getCarId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void updateReview_ShouldThrowException_WhenAutoSalonNotFound() {
+        when(reviewRepository.findById(1)).thenReturn(Optional.of(review));
+        when(clientRepository.findById(reviewRequestDto.getClientId())).thenReturn(Optional.of(client));
+        when(autoSalonRepository.findById(reviewRequestDto.getAutoSalonId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                reviewService.updateReview(1, reviewRequestDto));
+
+        assertEquals(AutoSalonExceptionCode.AUTO_SALON_NOT_FOUNT_BY_ID.getMessage() + reviewRequestDto.getAutoSalonId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void updateReview_ShouldThrowException_WhenDealerNotFound() {
+        reviewRequestDto.setCarId(null);
+        reviewRequestDto.setDealerId(1);
+        reviewRequestDto.setAutoSalonId(null);
+
+        when(reviewRepository.findById(1)).thenReturn(Optional.of(review));
+        when(clientRepository.findById(reviewRequestDto.getClientId())).thenReturn(Optional.of(client));
+        when(dealerRepository.findById(reviewRequestDto.getDealerId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                reviewService.updateReview(1, reviewRequestDto));
+
+        assertEquals(DealerExceptionCode.DEALER_NOT_FOUNT_BY_ID.getMessage() + reviewRequestDto.getDealerId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void deleteReviewById_ShouldThrowException_WhenReviewNotFound() {
+        when(reviewRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                reviewService.deleteReviewById(1));
+
+        assertEquals(ReviewExceptionCode.REVIEW_NOT_FOUND_BY_ID.getMessage() + 1,
+                exception.getMessage());
     }
 }

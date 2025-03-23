@@ -83,6 +83,8 @@ public class AutoSalonServiceImpl implements AutoSalonService {
     }
 
     public void deleteAutoSalonById(int id) {
+        autoSalonRepository.findById(id)
+                        .orElseThrow(() -> new ServiceException(AutoSalonExceptionCode.AUTO_SALON_NOT_FOUNT_BY_ID.getMessage() + id));
         autoSalonRepository.deleteById(id);
     }
 

@@ -2,10 +2,12 @@ package org.example.service;
 
 import org.example.dto.request.ContactRequestDto;
 import org.example.dto.response.ContactResponseDto;
+import org.example.exception.ServiceException;
 import org.example.mapper.ContactMapper;
 import org.example.model.Contact;
 import org.example.repository.ContactRepository;
 import org.example.service.impl.ContactServiceImpl;
+import org.example.util.error.ContactExceptionCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +20,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -42,35 +45,34 @@ class ContactServiceTest {
     void setUp() {
         contactRequestDto = ContactRequestDto.builder()
                 .contactType("Email")
-                .contactValue("example@example.com")
+                .contactValue("test@example.com")
                 .build();
 
         contact = new Contact();
 
         contactResponseDto = ContactResponseDto.builder()
                 .id(1)
-                .contactType(contactRequestDto.getContactType())
-                .contactValue(contactRequestDto.getContactValue())
+                .contactType("Email")
+                .contactValue("test@example.com")
                 .build();
     }
 
     @Test
-    void testAddContact() {
+    void addContact_ShouldSaveContact() {
         when(contactMapper.toEntity(contactRequestDto)).thenReturn(contact);
         when(contactRepository.save(contact)).thenReturn(contact);
 
         contactService.addContact(contactRequestDto);
 
-        verify(contactMapper).toEntity(contactRequestDto);
         verify(contactRepository).save(contact);
     }
 
     @Test
-    void testGetAllContacts() {
+    void getAllContacts_ShouldReturnListOfContacts() {
         when(contactRepository.findAll()).thenReturn(List.of(contact));
         when(contactMapper.toDto(contact)).thenReturn(contactResponseDto);
 
-        var result = contactService.getAllContacts();
+        List<ContactResponseDto> result = contactService.getAllContacts();
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -78,7 +80,7 @@ class ContactServiceTest {
     }
 
     @Test
-    void testGetContactById() {
+    void getContactById_ShouldReturnContact() {
         when(contactRepository.findById(1)).thenReturn(Optional.of(contact));
         when(contactMapper.toDto(contact)).thenReturn(contactResponseDto);
 
@@ -89,7 +91,7 @@ class ContactServiceTest {
     }
 
     @Test
-    void testUpdateContact() {
+    void updateContact_ShouldUpdateContact() {
         when(contactRepository.findById(1)).thenReturn(Optional.of(contact));
         doNothing().when(contactMapper).updateEntityFromDto(contactRequestDto, contact);
         when(contactRepository.save(contact)).thenReturn(contact);
@@ -100,11 +102,44 @@ class ContactServiceTest {
     }
 
     @Test
-    void testDeleteContactById() {
+    void deleteContactById_ShouldDeleteContact() {
         when(contactRepository.findById(1)).thenReturn(Optional.of(contact));
 
         contactService.deleteContactById(1);
 
         verify(contactRepository).deleteById(1);
+    }
+
+    @Test
+    void getContactById_ShouldThrowException_WhenContactNotFound() {
+        when(contactRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                contactService.getContactById(1));
+
+        assertEquals(ContactExceptionCode.CONTACT_NOT_FOUND_BY_ID.getMessage() + 1, 
+                exception.getMessage());
+    }
+
+    @Test
+    void updateContact_ShouldThrowException_WhenContactNotFound() {
+        when(contactRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                contactService.updateContact(1, contactRequestDto));
+
+        assertEquals(ContactExceptionCode.CONTACT_NOT_FOUND_BY_ID.getMessage() + 1, 
+                exception.getMessage());
+    }
+
+    @Test
+    void deleteContactById_ShouldThrowException_WhenContactNotFound() {
+        when(contactRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                contactService.deleteContactById(1));
+
+        assertEquals(ContactExceptionCode.CONTACT_NOT_FOUND_BY_ID.getMessage() + 1, 
+                exception.getMessage());
     }
 }

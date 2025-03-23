@@ -2,6 +2,7 @@ package org.example.service;
 
 import org.example.dto.request.SaleRequestDto;
 import org.example.dto.response.SaleResponseDto;
+import org.example.exception.ServiceException;
 import org.example.mapper.SaleMapper;
 import org.example.model.Sale;
 import org.example.model.AutoSalon;
@@ -14,6 +15,11 @@ import org.example.repository.ClientRepository;
 import org.example.repository.EmployeeRepository;
 import org.example.repository.SaleRepository;
 import org.example.service.impl.SaleServiceImpl;
+import org.example.util.error.AutoSalonExceptionCode;
+import org.example.util.error.CarExceptionCode;
+import org.example.util.error.ClientExceptionCode;
+import org.example.util.error.EmployeeExceptionCode;
+import org.example.util.error.SaleExceptionCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +34,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -183,5 +190,146 @@ class SaleServiceTest {
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals(saleResponseDto, result.get(0));
+    }
+
+    @Test
+    void addSale_ShouldThrowException_WhenAutoSalonNotFound() {
+        when(saleMapper.toEntity(saleRequestDto)).thenReturn(sale);
+        when(autoSalonRepository.findById(saleRequestDto.getAutoSalonId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                saleService.addSale(saleRequestDto));
+
+        assertEquals(AutoSalonExceptionCode.AUTO_SALON_NOT_FOUNT_BY_ID.getMessage() + saleRequestDto.getAutoSalonId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void addSale_ShouldThrowException_WhenClientNotFound() {
+        when(saleMapper.toEntity(saleRequestDto)).thenReturn(sale);
+        when(autoSalonRepository.findById(saleRequestDto.getAutoSalonId())).thenReturn(Optional.of(autoSalon));
+        when(clientRepository.findById(saleRequestDto.getClientId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                saleService.addSale(saleRequestDto));
+
+        assertEquals(ClientExceptionCode.CLIENT_NOT_FOUND_BY_ID.getMessage() + saleRequestDto.getClientId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void addSale_ShouldThrowException_WhenCarNotFound() {
+        when(saleMapper.toEntity(saleRequestDto)).thenReturn(sale);
+        when(autoSalonRepository.findById(saleRequestDto.getAutoSalonId())).thenReturn(Optional.of(autoSalon));
+        when(clientRepository.findById(saleRequestDto.getClientId())).thenReturn(Optional.of(client));
+        when(carRepository.findById(saleRequestDto.getCarId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                saleService.addSale(saleRequestDto));
+
+        assertEquals(CarExceptionCode.CAR_NOT_FOUNT_BY_VIN.getMessage() + saleRequestDto.getCarId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void addSale_ShouldThrowException_WhenEmployeeNotFound() {
+        when(saleMapper.toEntity(saleRequestDto)).thenReturn(sale);
+        when(autoSalonRepository.findById(saleRequestDto.getAutoSalonId())).thenReturn(Optional.of(autoSalon));
+        when(clientRepository.findById(saleRequestDto.getClientId())).thenReturn(Optional.of(client));
+        when(carRepository.findById(saleRequestDto.getCarId())).thenReturn(Optional.of(car));
+        when(employeeRepository.findById(saleRequestDto.getEmployeeId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                saleService.addSale(saleRequestDto));
+
+        assertEquals(EmployeeExceptionCode.EMPLOYEE_NOT_FOUND_BY_ID.getMessage() + saleRequestDto.getEmployeeId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void getSaleById_ShouldThrowException_WhenSaleNotFound() {
+        when(saleRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                saleService.getSaleById(1));
+
+        assertEquals(SaleExceptionCode.SALE_NOT_FOUND_BY_ID.getMessage() + 1,
+                exception.getMessage());
+    }
+
+    @Test
+    void updateSale_ShouldThrowException_WhenSaleNotFound() {
+        when(saleRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                saleService.updateSale(1, saleRequestDto));
+
+        assertEquals(SaleExceptionCode.SALE_NOT_FOUND_BY_ID.getMessage() + 1,
+                exception.getMessage());
+    }
+
+    @Test
+    void updateSale_ShouldThrowException_WhenAutoSalonNotFound() {
+        when(saleRepository.findById(1)).thenReturn(Optional.of(sale));
+        when(autoSalonRepository.findById(saleRequestDto.getAutoSalonId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                saleService.updateSale(1, saleRequestDto));
+
+        assertEquals(AutoSalonExceptionCode.AUTO_SALON_NOT_FOUNT_BY_ID.getMessage() + saleRequestDto.getAutoSalonId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void updateSale_ShouldThrowException_WhenClientNotFound() {
+        when(saleRepository.findById(1)).thenReturn(Optional.of(sale));
+        when(autoSalonRepository.findById(saleRequestDto.getAutoSalonId())).thenReturn(Optional.of(autoSalon));
+        when(clientRepository.findById(saleRequestDto.getClientId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                saleService.updateSale(1, saleRequestDto));
+
+        assertEquals(ClientExceptionCode.CLIENT_NOT_FOUND_BY_ID.getMessage() + saleRequestDto.getClientId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void updateSale_ShouldThrowException_WhenCarNotFound() {
+        when(saleRepository.findById(1)).thenReturn(Optional.of(sale));
+        when(autoSalonRepository.findById(saleRequestDto.getAutoSalonId())).thenReturn(Optional.of(autoSalon));
+        when(clientRepository.findById(saleRequestDto.getClientId())).thenReturn(Optional.of(client));
+        when(carRepository.findById(saleRequestDto.getCarId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                saleService.updateSale(1, saleRequestDto));
+
+        assertEquals(CarExceptionCode.CAR_NOT_FOUNT_BY_VIN.getMessage() + saleRequestDto.getCarId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void updateSale_ShouldThrowException_WhenEmployeeNotFound() {
+        when(saleRepository.findById(1)).thenReturn(Optional.of(sale));
+        when(autoSalonRepository.findById(saleRequestDto.getAutoSalonId())).thenReturn(Optional.of(autoSalon));
+        when(clientRepository.findById(saleRequestDto.getClientId())).thenReturn(Optional.of(client));
+        when(carRepository.findById(saleRequestDto.getCarId())).thenReturn(Optional.of(car));
+        when(employeeRepository.findById(saleRequestDto.getEmployeeId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                saleService.updateSale(1, saleRequestDto));
+
+        assertEquals(EmployeeExceptionCode.EMPLOYEE_NOT_FOUND_BY_ID.getMessage() + saleRequestDto.getEmployeeId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void deleteSaleById_ShouldThrowException_WhenSaleNotFound() {
+        when(saleRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                saleService.deleteSaleById(1));
+
+        assertEquals(SaleExceptionCode.SALE_NOT_FOUND_BY_ID.getMessage() + 1,
+                exception.getMessage());
     }
 }

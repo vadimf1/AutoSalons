@@ -3,6 +3,7 @@ package org.example.service;
 import org.example.dto.request.DealerRequestDto;
 import org.example.dto.request.DealerFilterRequest;
 import org.example.dto.response.DealerResponseDto;
+import org.example.exception.ServiceException;
 import org.example.mapper.DealerMapper;
 import org.example.model.Dealer;
 import org.example.model.Address;
@@ -11,6 +12,9 @@ import org.example.repository.AddressRepository;
 import org.example.repository.ContactRepository;
 import org.example.repository.DealerRepository;
 import org.example.service.impl.DealerServiceImpl;
+import org.example.util.error.AddressExceptionCode;
+import org.example.util.error.ContactExceptionCode;
+import org.example.util.error.DealerExceptionCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +28,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
@@ -45,28 +50,28 @@ class DealerServiceTest {
     @InjectMocks
     private DealerServiceImpl dealerService;
 
+    private DealerRequestDto dealerRequestDto;
     private Dealer dealer;
     private Address address;
     private Contact contact;
-    private DealerRequestDto dealerRequestDto;
     private DealerResponseDto dealerResponseDto;
     private DealerFilterRequest dealerFilterRequest;
 
     @BeforeEach
     void setUp() {
+        dealerRequestDto = DealerRequestDto.builder()
+                .name("Test Dealer")
+                .addressId(1)
+                .contactIds(List.of(1))
+                .build();
+
         dealer = new Dealer();
         address = new Address();
         contact = new Contact();
 
-        dealerRequestDto = DealerRequestDto.builder()
-                .name("Dealer1")
-                .addressId(1)
-                .contactIds(List.of(1, 2))
-                .build();
-
         dealerResponseDto = DealerResponseDto.builder()
                 .id(1)
-                .name("Dealer1")
+                .name("Test Dealer")
                 .build();
 
         dealerFilterRequest = DealerFilterRequest.builder()
@@ -79,7 +84,6 @@ class DealerServiceTest {
     void addDealer_ShouldSaveDealer() {
         when(addressRepository.findById(dealerRequestDto.getAddressId())).thenReturn(Optional.of(address));
         when(contactRepository.findById(1)).thenReturn(Optional.of(contact));
-        when(contactRepository.findById(2)).thenReturn(Optional.of(contact));
         when(dealerMapper.toEntity(dealerRequestDto)).thenReturn(dealer);
 
         dealerService.addDealer(dealerRequestDto);
@@ -95,7 +99,7 @@ class DealerServiceTest {
         List<DealerResponseDto> result = dealerService.getAllDealers();
 
         assertEquals(1, result.size());
-        assertEquals("Dealer1", result.get(0).getName());
+        assertEquals("Test Dealer", result.get(0).getName());
     }
 
     @Test
@@ -106,7 +110,7 @@ class DealerServiceTest {
         DealerResponseDto result = dealerService.getDealerById(1);
 
         assertNotNull(result);
-        assertEquals("Dealer1", result.getName());
+        assertEquals("Test Dealer", result.getName());
     }
 
     @Test
@@ -114,7 +118,6 @@ class DealerServiceTest {
         when(dealerRepository.findById(1)).thenReturn(Optional.of(dealer));
         when(addressRepository.findById(dealerRequestDto.getAddressId())).thenReturn(Optional.of(address));
         when(contactRepository.findById(1)).thenReturn(Optional.of(contact));
-        when(contactRepository.findById(2)).thenReturn(Optional.of(contact));
         doNothing().when(dealerMapper).updateEntityFromDto(dealerRequestDto, dealer);
 
         dealerService.updateDealer(1, dealerRequestDto);
@@ -131,7 +134,7 @@ class DealerServiceTest {
         List<DealerResponseDto> result = dealerService.getFilteredDealers(dealerFilterRequest);
 
         assertEquals(1, result.size());
-        assertEquals("Dealer1", result.get(0).getName());
+        assertEquals("Test Dealer", result.get(0).getName());
     }
 
     @Test
@@ -141,5 +144,88 @@ class DealerServiceTest {
         dealerService.deleteDealerById(1);
 
         verify(dealerRepository, times(1)).deleteById(1);
+    }
+
+    @Test
+    void addDealer_ShouldThrowException_WhenAddressNotFound() {
+        when(dealerMapper.toEntity(dealerRequestDto)).thenReturn(dealer);
+        when(addressRepository.findById(dealerRequestDto.getAddressId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                dealerService.addDealer(dealerRequestDto));
+
+        assertEquals(AddressExceptionCode.ADDRESS_NOT_FOUNT_BY_ID.getMessage() + dealerRequestDto.getAddressId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void addDealer_ShouldThrowException_WhenContactNotFound() {
+        when(dealerMapper.toEntity(dealerRequestDto)).thenReturn(dealer);
+        when(addressRepository.findById(dealerRequestDto.getAddressId())).thenReturn(Optional.of(address));
+        when(contactRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                dealerService.addDealer(dealerRequestDto));
+
+        assertEquals(ContactExceptionCode.CONTACT_NOT_FOUND_BY_ID.getMessage() + 1,
+                exception.getMessage());
+    }
+
+    @Test
+    void getDealerById_ShouldThrowException_WhenDealerNotFound() {
+        when(dealerRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                dealerService.getDealerById(1));
+
+        assertEquals(DealerExceptionCode.DEALER_NOT_FOUNT_BY_ID.getMessage() + 1,
+                exception.getMessage());
+    }
+
+    @Test
+    void updateDealer_ShouldThrowException_WhenDealerNotFound() {
+        when(dealerRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                dealerService.updateDealer(1, dealerRequestDto));
+
+        assertEquals(DealerExceptionCode.DEALER_NOT_FOUNT_BY_ID.getMessage() + 1,
+                exception.getMessage());
+    }
+
+    @Test
+    void updateDealer_ShouldThrowException_WhenAddressNotFound() {
+        when(dealerRepository.findById(1)).thenReturn(Optional.of(dealer));
+        when(addressRepository.findById(dealerRequestDto.getAddressId())).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                dealerService.updateDealer(1, dealerRequestDto));
+
+        assertEquals(AddressExceptionCode.ADDRESS_NOT_FOUNT_BY_ID.getMessage() + dealerRequestDto.getAddressId(),
+                exception.getMessage());
+    }
+
+    @Test
+    void updateDealer_ShouldThrowException_WhenContactNotFound() {
+        when(dealerRepository.findById(1)).thenReturn(Optional.of(dealer));
+        when(addressRepository.findById(dealerRequestDto.getAddressId())).thenReturn(Optional.of(address));
+        when(contactRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                dealerService.updateDealer(1, dealerRequestDto));
+
+        assertEquals(ContactExceptionCode.CONTACT_NOT_FOUND_BY_ID.getMessage() + 1,
+                exception.getMessage());
+    }
+
+    @Test
+    void deleteDealerById_ShouldThrowException_WhenDealerNotFound() {
+        when(dealerRepository.findById(1)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                dealerService.deleteDealerById(1));
+
+        assertEquals(DealerExceptionCode.DEALER_NOT_FOUNT_BY_ID.getMessage() + 1,
+                exception.getMessage());
     }
 }
