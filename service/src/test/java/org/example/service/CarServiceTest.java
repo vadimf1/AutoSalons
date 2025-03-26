@@ -78,7 +78,6 @@ class CarServiceTest {
                 .engineType("Petrol")
                 .fuelType("Gasoline")
                 .transmission("Automatic")
-                .status("New")
                 .autoSalonIds(Arrays.asList(1, 2))
                 .dealerId(1)
                 .price(BigDecimal.valueOf(15000))
@@ -94,7 +93,6 @@ class CarServiceTest {
                 .engineType("Hybrid")
                 .fuelType("Hybrid")
                 .transmission("Automatic")
-                .status("Used")
                 .autoSalonIds(Arrays.asList(1, 3))
                 .dealerId(2)
                 .price(BigDecimal.valueOf(18000))
@@ -106,17 +104,6 @@ class CarServiceTest {
         dealerCar = new DealerCar();
 
         carResponseDto = CarResponseDto.builder()
-                .id(1)
-                .make("Toyota")
-                .model("Corolla")
-                .vin("1HGBH41JXMN109186")
-                .year(2020)
-                .color("Red")
-                .bodyType("Sedan")
-                .engineType("Petrol")
-                .fuelType("Gasoline")
-                .transmission("Automatic")
-                .status("New")
                 .build();
     }
 

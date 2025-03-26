@@ -13,7 +13,7 @@ import org.example.model.Contact;
 import org.example.repository.AddressRepository;
 import org.example.repository.AutoSalonRepository;
 import org.example.repository.ContactRepository;
-import org.example.repository.specification.AutoSalonSpecification;
+import org.example.specification.AutoSalonSpecification;
 import org.example.service.AutoSalonService;
 import org.example.util.error.AddressExceptionCode;
 import org.example.util.error.AutoSalonExceptionCode;

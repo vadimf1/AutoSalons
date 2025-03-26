@@ -11,7 +11,7 @@ import org.example.repository.AutoSalonRepository;
 import org.example.repository.CarRepository;
 import org.example.repository.DealerCarRepository;
 import org.example.repository.DealerRepository;
-import org.example.repository.specification.CarSpecification;
+import org.example.specification.CarSpecification;
 import org.example.dto.request.CarFilterRequest;
 import org.example.exception.ServiceException;
 import org.example.mapper.CarMapper;

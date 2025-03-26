@@ -1,7 +1,6 @@
 package org.example.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.aop.Loggable;
 import org.example.dto.request.LoginRequestDto;
 import org.example.dto.response.LoginResponseDto;
 import org.example.dto.request.RefreshTokenRequestDto;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
     private final AuthService authService;
 
-    @Loggable
     @PostMapping("/registration")
     public ResponseEntity<String> registration(@RequestBody RegisterRequestDto registerRequestDto) {
         authService.register(registerRequestDto);

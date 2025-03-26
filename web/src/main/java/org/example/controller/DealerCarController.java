@@ -2,7 +2,6 @@ package org.example.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.aop.Loggable;
 import org.example.dto.request.DealerCarRequestDto;
 import org.example.dto.response.DealerCarResponseDto;
 import org.example.service.DealerCarService;
@@ -31,7 +30,6 @@ public class DealerCarController {
         return ResponseEntity.ok(dealerCarService.getDealerCarById(id));
     }
 
-    @Loggable
     @GetMapping("/car/{carId}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<DealerCarResponseDto>> getDealersCarByCarId(@PathVariable int carId) {
@@ -44,7 +42,6 @@ public class DealerCarController {
         return ResponseEntity.ok(dealerCarService.getDealerCarsByDealerId(dealerId));
     }
 
-    @Loggable
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public ResponseEntity<String> addDealerCar(@Valid @RequestBody DealerCarRequestDto dealerCarDto) {

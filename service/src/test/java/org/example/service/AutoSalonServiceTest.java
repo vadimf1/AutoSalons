@@ -134,6 +134,7 @@ class AutoSalonServiceTest {
 
     @Test
     void deleteAutoSalonById_ShouldDeleteAutoSalon() {
+        when(autoSalonRepository.findById(1)).thenReturn(Optional.of(autoSalon));
         doNothing().when(autoSalonRepository).deleteById(1);
 
         autoSalonService.deleteAutoSalonById(1);

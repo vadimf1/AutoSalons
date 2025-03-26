@@ -1,17 +1,16 @@
-package org.example.repository.specification;
+package org.example.specification;
 
 import jakarta.persistence.criteria.Predicate;
 import lombok.experimental.UtilityClass;
-import org.example.model.AutoSalon;
+import org.example.model.Dealer;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @UtilityClass
-public class AutoSalonSpecification {
-
-    public Specification<AutoSalon> filter(String city, String name) {
+public class DealerSpecification {
+    public Specification<Dealer> filter(String city, String name) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 

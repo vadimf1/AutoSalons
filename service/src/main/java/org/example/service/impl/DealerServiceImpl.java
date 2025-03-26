@@ -11,7 +11,7 @@ import org.example.model.Dealer;
 import org.example.repository.AddressRepository;
 import org.example.repository.ContactRepository;
 import org.example.repository.DealerRepository;
-import org.example.repository.specification.DealerSpecification;
+import org.example.specification.DealerSpecification;
 import org.example.service.DealerService;
 import org.example.util.error.AddressExceptionCode;
 import org.example.util.error.ContactExceptionCode;

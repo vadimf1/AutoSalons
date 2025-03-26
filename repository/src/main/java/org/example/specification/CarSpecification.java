@@ -1,4 +1,4 @@
-package org.example.repository.specification;
+package org.example.specification;
 
 import jakarta.persistence.criteria.Predicate;
 import lombok.experimental.UtilityClass;

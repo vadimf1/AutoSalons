@@ -7,9 +7,17 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
-    show-sql: true
+    show-sql: false
   liquibase:
     change-log: classpath:/db/changelog/db.changelog-master.xml
+
+logging:
+  level:
+    root: INFO
+  file:
+    name: app.log
+    path: /
+
 
 jwt:
   secret: Y2mEHclUKTnwfxT9V+0YECgdn8r7Ieryk2e7IraH8k0=

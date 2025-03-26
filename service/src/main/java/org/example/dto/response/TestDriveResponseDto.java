@@ -13,5 +13,4 @@ public class TestDriveResponseDto {
     private ClientResponseDto client;
     private CarResponseDto car;
     private LocalDate testDriveDate;
-    private String status;
 }

@@ -2,7 +2,6 @@ package org.example.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.aop.Loggable;
 import org.example.dto.request.UpdateCarDto;
 import org.example.dto.response.CarResponseDto;
 import org.example.dto.request.AddCarDto;
@@ -28,7 +27,6 @@ public class CarController {
 
     private final CarService carService;
 
-    @Loggable
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public ResponseEntity<List<CarResponseDto>> getAllCars() {
@@ -47,7 +45,6 @@ public class CarController {
         return ResponseEntity.ok(carService.getFilteredCars(carFilterRequest));
     }
 
-    @Loggable
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public ResponseEntity<String> addCar(@Valid @RequestBody AddCarDto addCarDto) {
@@ -62,7 +59,6 @@ public class CarController {
         return ResponseEntity.ok("Car updated successfully");
     }
 
-    @Loggable
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteCar(@PathVariable("id") int id) {

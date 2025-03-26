@@ -2,7 +2,6 @@ package org.example.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.aop.Loggable;
 import org.example.dto.request.AutoSalonFilterRequest;
 import org.example.dto.request.AutoSalonRequestDto;
 import org.example.dto.response.AutoSalonResponseDto;
@@ -38,7 +37,6 @@ public class AutoSalonController {
         return ResponseEntity.ok(autoSalonService.getFilteredAutoSalons(autoSalonFilterRequest));
     }
 
-    @Loggable
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public ResponseEntity<String> addAutoSalon(@Valid @RequestBody AutoSalonRequestDto autoSalonDto) {

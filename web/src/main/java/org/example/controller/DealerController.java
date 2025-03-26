@@ -2,7 +2,6 @@ package org.example.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.aop.Loggable;
 import org.example.dto.request.DealerFilterRequest;
 import org.example.dto.request.DealerRequestDto;
 import org.example.dto.response.DealerResponseDto;
@@ -38,7 +37,6 @@ public class DealerController {
         return ResponseEntity.ok(dealerService.getFilteredDealers(dealerFilterRequest));
     }
 
-    @Loggable
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public ResponseEntity<String> addDealer(@Valid @RequestBody DealerRequestDto dealerDto) {

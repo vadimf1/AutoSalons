@@ -22,7 +22,4 @@ public class TestDriveRequestDto {
 
     @NotNull(message = "Дата тест-драйва обязательна")
     private LocalDate testDriveDate;
-
-    @Size(min = 3, max = 20, message = "Статус должен быть от 3 до 20 символов")
-    private String status;
 }

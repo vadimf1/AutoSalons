@@ -54,9 +54,6 @@ public class Car extends BaseEntity {
     @Column(name = "transmission", nullable = false)
     private String transmission;
 
-    @Column(name = "status", nullable = false)
-    private String status;
-
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "autosalons_cars",

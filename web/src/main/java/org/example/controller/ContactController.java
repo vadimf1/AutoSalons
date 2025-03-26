@@ -2,7 +2,6 @@ package org.example.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.aop.Loggable;
 import org.example.dto.request.ContactRequestDto;
 import org.example.dto.response.ContactResponseDto;
 import org.example.service.ContactService;
@@ -31,7 +30,6 @@ public class ContactController {
         return ResponseEntity.ok(contactService.getContactById(id));
     }
 
-    @Loggable
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public ResponseEntity<String> addContact(@Valid @RequestBody ContactRequestDto contactDto) {

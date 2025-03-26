@@ -13,7 +13,7 @@ import org.example.dto.response.ReviewResponseDto;
 import org.example.exception.ServiceException;
 import org.example.mapper.ReviewMapper;
 import org.example.model.Review;
-import org.example.repository.specification.ReviewSpecification;
+import org.example.specification.ReviewSpecification;
 import org.example.service.ReviewService;
 import org.example.util.error.AutoSalonExceptionCode;
 import org.example.util.error.CarExceptionCode;

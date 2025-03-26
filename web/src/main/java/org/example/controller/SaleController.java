@@ -2,7 +2,6 @@ package org.example.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.aop.Loggable;
 import org.example.dto.request.SaleRequestDto;
 import org.example.dto.response.SaleResponseDto;
 import org.example.service.SaleService;
@@ -37,7 +36,6 @@ public class SaleController {
         return ResponseEntity.ok(saleService.getSaleByClientId(clientId));
     }
 
-    @Loggable
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public ResponseEntity<String> addSale(@Valid @RequestBody SaleRequestDto saleDto) {

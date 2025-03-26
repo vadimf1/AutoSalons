@@ -6,7 +6,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -37,7 +36,4 @@ public class TestDrive extends BaseEntity {
 
     @Column(name = "test_drive_date")
     private LocalDate testDriveDate;
-
-    @Column(name = "status")
-    private String status;
 }

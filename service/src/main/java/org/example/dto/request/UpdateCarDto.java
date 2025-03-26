@@ -55,10 +55,6 @@ public class UpdateCarDto {
     @Size(max = 30, message = "Максимальная длина трансмиссии — 30 символов")
     private String transmission;
 
-    @NotBlank(message = "Статус не должен быть пустым")
-    @Size(max = 20, message = "Максимальная длина статуса — 20 символов")
-    private String status;
-
     @NotNull(message = "Автосалон не может быть пустым")
     @Size(min = 1, message = "Список автосалонов не может быть пустым")
     private List<Integer> autoSalonIds;

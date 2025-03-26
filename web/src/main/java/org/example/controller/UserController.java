@@ -2,7 +2,6 @@ package org.example.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.aop.Loggable;
 import org.example.dto.request.UserProfileUpdateDto;
 import org.example.dto.request.UserRequestDto;
 import org.example.dto.response.UserResponseDto;
@@ -27,7 +26,6 @@ public class UserController {
 
     private final UserService userService;
 
-    @Loggable
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserResponseDto>> getAllUsers() {

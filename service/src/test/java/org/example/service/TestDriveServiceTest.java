@@ -70,7 +70,6 @@ class TestDriveServiceTest {
                 .carId(1)
                 .clientId(1)
                 .testDriveDate(LocalDate.now())
-                .status("Scheduled")
                 .build();
 
         autoSalon = new AutoSalon();
@@ -79,9 +78,6 @@ class TestDriveServiceTest {
         testDrive = new TestDrive();
 
         testDriveResponseDto = TestDriveResponseDto.builder()
-                .id(1)
-                .testDriveDate(LocalDate.now())
-                .status("Scheduled")
                 .build();
     }
 

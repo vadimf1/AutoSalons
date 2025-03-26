@@ -14,7 +14,6 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
 
 @SuperBuilder
@@ -52,25 +51,4 @@ public class Client extends BaseEntity {
 
     @OneToMany(mappedBy = "client")
     private Set<Sale> sales;
-
-    public void addReview(Review review) {
-        if (reviews == null) {
-            reviews = new HashSet<>();
-        }
-        reviews.add(review);
-    }
-
-    public void addTestDrive(TestDrive testDrive) {
-        if (testDrives == null) {
-            testDrives = new HashSet<>();
-        }
-        testDrives.add(testDrive);
-    }
-
-    public void addSale(Sale sale) {
-        if (sales == null) {
-            sales = new HashSet<>();
-        }
-        sales.add(sale);
-    }
 }

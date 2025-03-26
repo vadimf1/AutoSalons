@@ -1,0 +1,63 @@
+2025-03-26 13:44:48 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.2.Final
+2025-03-26 13:44:48 [main] INFO  o.example.AutoSalonsAppApplication - Starting AutoSalonsAppApplication using Java 23.0.2 with PID 21872 (/Users/vadimfunt/Desktop/Java/final-task/AutoSalons/web/target/classes started by vadimfunt in /Users/vadimfunt/Desktop/Java/final-task/AutoSalons)
+2025-03-26 13:44:48 [main] INFO  o.example.AutoSalonsAppApplication - No active profile set, falling back to 1 default profile: "default"
+2025-03-26 13:44:49 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-03-26 13:44:49 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 46 ms. Found 13 JPA repository interfaces.
+2025-03-26 13:44:49 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2025-03-26 13:44:49 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2025-03-26 13:44:49 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-03-26 13:44:49 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.36]
+2025-03-26 13:44:49 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-03-26 13:44:49 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 848 ms
+2025-03-26 13:44:49 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-03-26 13:44:49 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.8.Final
+2025-03-26 13:44:49 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2025-03-26 13:44:50 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-03-26 13:44:50 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-03-26 13:44:50 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@5c9b5e62
+2025-03-26 13:44:50 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-03-26 13:44:50 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-03-26 13:44:50 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-03-26 13:44:50 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-03-26 13:44:51 [main] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-03-26 13:44:51 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-03-26 13:44:51 [main] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name authProvider
+2025-03-26 13:44:51 [main] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-03-26 13:44:52 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2025-03-26 13:44:52 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2025-03-26 13:44:52 [main] INFO  o.example.AutoSalonsAppApplication - Started AutoSalonsAppApplication in 3.928 seconds (process running for 4.251)
+2025-03-26 13:44:54 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-03-26 13:44:54 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-03-26 13:44:54 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 3 ms
+2025-03-26 13:44:54 [http-nio-8080-exec-1] INFO  o.e.aop.ControllerLoggingAspect - Incoming request: AuthController.login(..) with parameters: [LoginRequestDto(username=john_doe1, password=password)]
+2025-03-26 13:44:54 [http-nio-8080-exec-1] INFO  o.example.aop.ServiceLoggingAspect - Executing AuthServiceImpl.login(..) with parameters: [LoginRequestDto(username=john_doe1, password=password)]
+2025-03-26 13:44:54 [http-nio-8080-exec-1] INFO  o.e.aop.RepositoryLoggingAspect - Executing UserRepository.findByUsername with parameters: [john_doe1]
+2025-03-26 13:44:54 [http-nio-8080-exec-1] INFO  o.e.aop.RepositoryLoggingAspect - Executed UserRepository.findByUsername successfully. Result: Optional[BaseEntity(id=1)]
+2025-03-26 13:44:54 [http-nio-8080-exec-1] INFO  o.example.aop.ServiceLoggingAspect - Executed AuthServiceImpl.login(..) successfully. Result: LoginResponseDto(jwtToken=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huX2RvZTEiLCJpYXQiOjE3NDI5ODU4OTQsImV4cCI6MTc0Mjk4Njc5NH0.YmEMQfDE3OxAVNAaD_xSgwS3Yy6XyqLDKciK4troRUc, refreshToken=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huX2RvZTEiLCJpYXQiOjE3NDI5ODU4OTQsImV4cCI6MTc0MzU5MDY5NH0.uTAHTjGP6F9Fa4sDUkz01yvV_ZVFaP3lWulDHwRzNxs)
+2025-03-26 13:44:54 [http-nio-8080-exec-1] INFO  o.e.aop.ControllerLoggingAspect - Response from AuthController.login(..): Status 200 OK, Body LoginResponseDto(jwtToken=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huX2RvZTEiLCJpYXQiOjE3NDI5ODU4OTQsImV4cCI6MTc0Mjk4Njc5NH0.YmEMQfDE3OxAVNAaD_xSgwS3Yy6XyqLDKciK4troRUc, refreshToken=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huX2RvZTEiLCJpYXQiOjE3NDI5ODU4OTQsImV4cCI6MTc0MzU5MDY5NH0.uTAHTjGP6F9Fa4sDUkz01yvV_ZVFaP3lWulDHwRzNxs)
+2025-03-26 13:45:09 [http-nio-8080-exec-3] INFO  o.e.aop.ControllerLoggingAspect - Incoming request: AuthController.login(..) with parameters: [LoginRequestDto(username=john_doe1, password=password)]
+2025-03-26 13:45:09 [http-nio-8080-exec-3] INFO  o.example.aop.ServiceLoggingAspect - Executing AuthServiceImpl.login(..) with parameters: [LoginRequestDto(username=john_doe1, password=password)]
+2025-03-26 13:45:09 [http-nio-8080-exec-3] INFO  o.e.aop.RepositoryLoggingAspect - Executing UserRepository.findByUsername with parameters: [john_doe1]
+2025-03-26 13:45:09 [http-nio-8080-exec-3] INFO  o.e.aop.RepositoryLoggingAspect - Executed UserRepository.findByUsername successfully. Result: Optional[BaseEntity(id=1)]
+2025-03-26 13:45:09 [http-nio-8080-exec-3] INFO  o.example.aop.ServiceLoggingAspect - Executed AuthServiceImpl.login(..) successfully. Result: LoginResponseDto(jwtToken=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huX2RvZTEiLCJpYXQiOjE3NDI5ODU5MDksImV4cCI6MTc0Mjk4NjgwOX0.nbL9NUXYIHpyXo1AFe4LOvAco3cG4v7yyw2iAQDJxYM, refreshToken=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huX2RvZTEiLCJpYXQiOjE3NDI5ODU5MDksImV4cCI6MTc0MzU5MDcwOX0.WKHhLzhuzoZ6UAOwETOiGsdK7haxJ_l1tV0oWVVjK_I)
+2025-03-26 13:45:09 [http-nio-8080-exec-3] INFO  o.e.aop.ControllerLoggingAspect - Response from AuthController.login(..): Status 200 OK, Body LoginResponseDto(jwtToken=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huX2RvZTEiLCJpYXQiOjE3NDI5ODU5MDksImV4cCI6MTc0Mjk4NjgwOX0.nbL9NUXYIHpyXo1AFe4LOvAco3cG4v7yyw2iAQDJxYM, refreshToken=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huX2RvZTEiLCJpYXQiOjE3NDI5ODU5MDksImV4cCI6MTc0MzU5MDcwOX0.WKHhLzhuzoZ6UAOwETOiGsdK7haxJ_l1tV0oWVVjK_I)
+2025-03-26 13:45:11 [http-nio-8080-exec-4] INFO  o.e.aop.RepositoryLoggingAspect - Executing UserRepository.findByUsername with parameters: [john_doe1]
+2025-03-26 13:45:11 [http-nio-8080-exec-4] INFO  o.e.aop.RepositoryLoggingAspect - Executed UserRepository.findByUsername successfully. Result: Optional[BaseEntity(id=1)]
+2025-03-26 13:45:11 [http-nio-8080-exec-4] INFO  o.e.aop.ControllerLoggingAspect - Incoming request: CarController.getAllCars() with parameters: []
+2025-03-26 13:45:11 [http-nio-8080-exec-4] INFO  o.example.aop.ServiceLoggingAspect - Executing CarServiceImpl.getAllCars() with parameters: []
+2025-03-26 13:45:11 [http-nio-8080-exec-4] INFO  o.e.aop.RepositoryLoggingAspect - Executing CarRepository.findAll with parameters: []
+2025-03-26 13:45:11 [http-nio-8080-exec-4] INFO  o.e.aop.RepositoryLoggingAspect - Executed CarRepository.findAll successfully. Result: [BaseEntity(id=1), BaseEntity(id=2), BaseEntity(id=3), BaseEntity(id=4), BaseEntity(id=5), BaseEntity(id=8)]
+2025-03-26 13:45:11 [http-nio-8080-exec-4] INFO  o.example.aop.ServiceLoggingAspect - Executed CarServiceImpl.getAllCars() successfully. Result: [CarResponseDto(id=1,vin=WBADE6329VB567890), CarResponseDto(id=2,vin=WAUEFAFLXEA123456), CarResponseDto(id=3,vin=WDDGF8AB8CA678901), CarResponseDto(id=4,vin=5YJSA1E44FF098765), CarResponseDto(id=5,vin=JTMRFREV9HJ123789), CarResponseDto(id=8,vin=WBADE6329VB567881)]
+2025-03-26 13:45:11 [http-nio-8080-exec-4] INFO  o.e.aop.ControllerLoggingAspect - Response from CarController.getAllCars(): Status 200 OK, Body [CarResponseDto(id=1,vin=WBADE6329VB567890), CarResponseDto(id=2,vin=WAUEFAFLXEA123456), CarResponseDto(id=3,vin=WDDGF8AB8CA678901), CarResponseDto(id=4,vin=5YJSA1E44FF098765), CarResponseDto(id=5,vin=JTMRFREV9HJ123789), CarResponseDto(id=8,vin=WBADE6329VB567881)]
+2025-03-26 13:45:18 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2025-03-26 13:45:18 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2025-03-26 13:45:18 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-03-26 13:45:18 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-03-26 13:45:18 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
